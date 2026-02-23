@@ -129,6 +129,45 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 
 ---
 
+### 2.3 Committed: `feat(ui): implement right-side portal content — MonthlyCalendar and RecentActivity`
+
+#### `app/components/CalendarHeader.tsx` *(new)*
+- Month/year title (uppercase bold) + prev/today/next navigation buttons
+- Chevron SVGs from Figma asset server; "Today" button in `#155DFC`
+
+#### `app/components/CalendarDayCell.tsx` *(new)*
+- Props: `day`, `isToday`, `isOtherMonth`, `logs[]`
+- Renders day number in a filled blue circle for today; greyed for other-month days
+- Stacks blue event chips (project name truncated + hours) per time log
+
+#### `app/components/CalendarGrid.tsx` *(new)*
+- Builds the calendar matrix from JS `Date` (no external library)
+- Mon-based weekday offset, leading/trailing padding cells from adjacent months
+- Renders 7-col day-of-week header row + grid of `CalendarDayCell`
+
+#### `app/components/MonthlyCalendar.tsx` *(new)*
+- Client component with `useState` for current month/year
+- Handles prev/today/next navigation logic
+- Composes `SectionHeader` + card shell + `CalendarHeader` + `CalendarGrid`
+- Pre-seeded with sample logs matching Figma (weekdays Feb 2–13, 8h each)
+
+#### `app/components/ActivityMonthRow.tsx` *(new)*
+- Client component: collapsible row with calendar icon, month label, total hours
+- Work hours (`#62748E`) and vacation hours (`#F97316`) shown as small labels
+- Chevron toggles `expanded` state with rotate animation
+
+#### `app/components/RecentActivity.tsx` *(new)*
+- Composes `SectionHeader` + card shell + three `ActivityMonthRow` items
+- Matches Figma data: April 2026 (92h), March 2026 (184h), February 2026 (112h)
+
+#### `app/components/PortalMainContent.tsx` *(new)*
+- Thin compositor: stacks `MonthlyCalendar` and `RecentActivity` with `gap-8`
+
+#### `app/portal/page.tsx` *(modified)*
+- Replaced `<div className="md:col-span-2" />` placeholder with `<PortalMainContent />`
+
+---
+
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
 
 ## Step 4: AI Chat Integration — 🔜 Pending
