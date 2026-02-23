@@ -1,5 +1,8 @@
 'use client'
 
+import EmployeeHeader from '../components/EmployeeHeader'
+import TopNav from '../components/TopNav'
+
 export default function EmployeePortal() {
     const handleLogout = () => {
         document.cookie = 'mock-role=; Max-Age=0; path=/'
@@ -8,13 +11,9 @@ export default function EmployeePortal() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center">
-                    <h1 className="text-xl font-bold text-gray-900">Employee Portal</h1>
-                    <button onClick={handleLogout} className="text-gray-500 hover:text-gray-700">Logout</button>
-                </div>
-            </nav>
-            <main className="max-w-7xl mx-auto py-6 px-4">
+            <TopNav onLogout={handleLogout} />
+            <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+                <EmployeeHeader userName="Marco" />
                 <div className="bg-white shadow rounded-lg p-6">
                     <h2 className="text-lg font-medium text-gray-900 mb-4">Log Time</h2>
                     <form className="space-y-4 max-w-md">

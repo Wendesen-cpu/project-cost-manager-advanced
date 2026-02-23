@@ -70,7 +70,41 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 
 ---
 
-## Step 2: UI Design (Figma MCP injection) — 🔜 Pending
+## Step 2: UI Design (Figma MCP injection)
+
+### 2.1 Committed: `feat(ui): add EmployeeHeader and TopNav components to portal page`
+
+#### `app/components/EmployeeHeader.tsx` *(new)*
+- Glassmorphism badge with frosted background
+- Gradient text for employee name
+- Built from Figma design specs
+
+#### `app/components/TopNav.tsx` *(new)*
+- Brand logo on the left
+- Language switcher (flag + label) on the right
+- Logout button
+- Aligned `max-w-screen-xl mx-auto` container to match main content padding
+
+#### `app/portal/page.tsx` *(modified)*
+- Replaced minimal wireframe with `<TopNav />` + `<EmployeeHeader />` layout
+- Aligned padding and container classes between TopNav and content area
+
+#### `app/components/LogWorkForm.tsx` *(new)*
+- Client component (`'use client'`)
+- Date input, Project select (with inline SVG chevron), Hours numeric input
+- "Log Hours" submit button styled with `#155DFC` brand blue
+- Max-width constrained to `302px` per Figma spec
+
+---
+
+### 2.2 Remaining UI — 🔜 In Progress
+
+- [ ] Build `StatCard.tsx`
+- [ ] Build `SectionHeader.tsx`
+- [ ] Build `ActivityAccordion.tsx`
+- [ ] Compose `EmployeeSidebar.tsx` and integrate into `app/portal/page.tsx`
+
+---
 
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
 
