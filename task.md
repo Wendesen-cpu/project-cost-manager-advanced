@@ -97,12 +97,35 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 
 ---
 
-### 2.2 Remaining UI — 🔜 In Progress
+### 2.2 Committed: `feat(ui): compose EmployeeSidebar with StatCard, SectionHeader, ActivityAccordion, and LogWorkForm`
 
-- [ ] Build `StatCard.tsx`
-- [ ] Build `SectionHeader.tsx`
-- [ ] Build `ActivityAccordion.tsx`
-- [ ] Compose `EmployeeSidebar.tsx` and integrate into `app/portal/page.tsx`
+#### `app/components/StatCard.tsx` *(new)*
+- Displays a single stat (title, large value, optional unit, icon)
+- Rounded card with subtle shadow, configurable icon background color (`iconBgColor`)
+- Styled per Figma: `#0F172B` value, `#62748E` label, uppercase tracking
+
+#### `app/components/SectionHeader.tsx` *(new)*
+- Small icon + uppercase bold label (`#62748E`, `tracking-[1.4px]`)
+- Used as a section divider above `StatCard` groups and `ActivityAccordion`
+
+#### `app/components/ActivityAccordion.tsx` *(new)*
+- Client component with `useState` collapse/expand toggle
+- Chevron rotates 180° on expand with `transition-transform`
+- `isLast` prop controls the bottom border separator
+- Uses `clsx` for conditional class merging
+
+#### `app/components/EmployeeSidebar.tsx` *(new)*
+- Composes the full left sidebar: `SectionHeader` → `StatCard` (×2) → `ActivityAccordion` × 2
+- "Log Work Hours" accordion expanded by default, wraps `<LogWorkForm />`
+- "Log Vacation" accordion placeholder (form coming soon)
+
+#### `app/portal/page.tsx` *(modified)*
+- Replaced the old generic time-log form with `<EmployeeSidebar />`
+- Wrapped in a responsive `grid grid-cols-1 md:grid-cols-3` layout
+- Right-hand 2-col area left as placeholder for future content
+
+#### `package.json` + `package-lock.json` *(modified)*
+- Added `clsx@^2.1.1` dependency (used by `ActivityAccordion`)
 
 ---
 
