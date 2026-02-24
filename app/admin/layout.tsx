@@ -13,7 +13,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
 
     return (
-        <div className="flex h-screen overflow-hidden bg-[#080F1C]">
+        <div className="flex h-screen overflow-hidden">
             {/* Fixed-width sidebar */}
             <AdminSidebar onLogout={handleLogout} />
 

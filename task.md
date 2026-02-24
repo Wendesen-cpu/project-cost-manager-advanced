@@ -190,6 +190,21 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 - Replaced all `localhost:3845` SVG assets across the Admin Sidebar (Logo, NavLinks, Footer) with equivalent vector icons from `lucide-react`.
 - `lucide-react` icons dynamically inherit active (`#155DFC` / white) and inactive (`#90A1B9`) color states.
 
+---
+
+### 2.5 Committed: `feat(ui): implement admin employees page table and user fetching`
+
+#### `app/api/admin/employees/route.ts` *(modified)*
+- Removed the strictly `Role.EMPLOYEE` query filter from the `GET` method.
+- The endpoint now returns all users (including admins) to populate the admin management table.
+
+#### `app/admin/employees/page.tsx` *(new)*
+- Created the main Admin Employees view using the same responsive container constraint (`max-w-7xl mx-auto px-4 md:px-8 lg:px-16`) as the Dashboard.
+- Added a full-width data table styled exactly to Figma specs (border `#e2e8f0`, shadow, text `#6a7282`).
+- Dynamically rendered Role and Email properties inside styled green badges (`bg-[#dcfce7] text-[#016630]`).
+- Hooked up an "Add Employee" button in the header directly to our `NewEmployeeModal`.
+- Added dynamic table refresh logic inside `useEffect` upon creation of a new employee via the modal.
+
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
 
 ## Step 4: AI Chat Integration — 🔜 Pending

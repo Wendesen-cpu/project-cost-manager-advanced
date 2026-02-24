@@ -5,7 +5,6 @@ import { Role } from '@lib/generated/prisma/enums'
 export async function GET() {
     try {
         const employees = await prisma.user.findMany({
-            where: { role: Role.EMPLOYEE },
             select: {
                 id: true,
                 name: true,
