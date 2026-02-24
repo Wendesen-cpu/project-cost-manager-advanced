@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="SVG">
+<path id="Summary Chevron Down" d="M9.75 6C9.75 3.93 7.905 2.25 5.625 2.25C3.345 2.25 1.5 3.93 1.5 6H3L3.75 5.25L4.5 6H7.5" stroke="var(--stroke-0, #009966)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Summary Chevron Up" d="M9.75 5.355C10.5095 4.79351 11.4305 4.4935 12.375 4.5C14.655 4.5 16.5 6.18 16.5 8.25H14.25L13.5 7.5L12.75 8.25H10.5" stroke="var(--stroke-0, #009966)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Summary Bullet Point" d="M4.4175 7.2825C2.805 8.895 2.6925 11.385 4.155 12.855L7.335 9.6675L7.86 9.1425L8.3925 8.61L9.9825 7.02C8.52 5.55 6.03 5.67 4.4175 7.2825Z" stroke="var(--stroke-0, #009966)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Summary Divider Line" d="M8.25 11.625C8.625 13.5 8.1225 15 7.5 16.5H10.5C12 12.375 10.125 7.5 9.75 6" stroke="var(--stroke-0, #009966)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

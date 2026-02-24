@@ -6,7 +6,7 @@ import CalendarHeader from './CalendarHeader'
 import CalendarGrid from './CalendarGrid'
 import type { TimeLog } from './CalendarDayCell'
 
-const calendarSectionIcon = 'http://localhost:3845/assets/2d34e5aece14cd8a8505c7260f6003a557b11b15.svg'
+import { Calendar } from 'lucide-react'
 
 // Static sample logs matching the Figma (every weekday in Feb 2026 = 8h, "Food deli..." project)
 const SAMPLE_LOGS: Record<string, TimeLog[]> = (() => {
@@ -40,7 +40,7 @@ export default function MonthlyCalendar() {
 
     return (
         <div className="flex flex-col gap-4">
-            <SectionHeader title="Monthly Calendar" iconSrc={calendarSectionIcon} />
+            <SectionHeader title="Monthly Calendar" icon={<Calendar className="size-[14px] text-[#62748E]" />} />
             <div className="overflow-hidden rounded-2xl border border-[#E2E8F0]/60 bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
                 <CalendarHeader
                     month={viewMonth}

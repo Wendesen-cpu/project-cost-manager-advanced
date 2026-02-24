@@ -5,17 +5,17 @@ import clsx from 'clsx'
 
 interface ActivityAccordionProps {
     title: string
-    iconSrc: string
+    icon: React.ReactNode
     defaultExpanded?: boolean
     children: React.ReactNode
     isLast?: boolean
 }
 
-const chevronDownIcon = "http://localhost:3845/assets/aec11f4d66a5bdcdfe4eb5593e3cdea196a03ea4.svg"
+import { ChevronDown } from 'lucide-react'
 
 export default function ActivityAccordion({
     title,
-    iconSrc,
+    icon,
     defaultExpanded = false,
     children,
     isLast = false
@@ -32,7 +32,7 @@ export default function ActivityAccordion({
             >
                 <div className="flex items-center gap-3">
                     <div className="flex p-2 rounded-lg bg-[#EFF6FF] shrink-0 items-center justify-center">
-                        <img src={iconSrc} alt="" className="size-[18px]" />
+                        {icon}
                     </div>
                     <span
                         className="text-[12px] font-bold uppercase tracking-[-0.3px] text-[#314158] leading-4"
@@ -41,11 +41,9 @@ export default function ActivityAccordion({
                         {title}
                     </span>
                 </div>
-                <img
-                    src={chevronDownIcon}
-                    alt="Toggle"
+                <ChevronDown
                     className={clsx(
-                        "size-[18px] transition-transform duration-200",
+                        "size-[18px] text-[#62748E] transition-transform duration-200",
                         isExpanded && "rotate-180"
                     )}
                 />

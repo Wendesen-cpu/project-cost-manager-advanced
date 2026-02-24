@@ -4,7 +4,7 @@ interface StatCardProps {
     title: string
     value: string | number
     unit?: string
-    iconSrc: string
+    icon: React.ReactNode
     iconBgColor?: string
 }
 
@@ -12,7 +12,7 @@ export default function StatCard({
     title,
     value,
     unit,
-    iconSrc,
+    icon,
     iconBgColor = 'bg-[#EFF6FF]'
 }: StatCardProps) {
     return (
@@ -42,7 +42,7 @@ export default function StatCard({
                 </div>
             </div>
             <div className={`relative shrink-0 flex items-center justify-center p-3 rounded-xl ${iconBgColor}`}>
-                <img alt="" className="size-6 shrink-0" src={iconSrc} />
+                {icon}
             </div>
         </div>
     )

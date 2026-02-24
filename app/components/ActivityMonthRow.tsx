@@ -3,8 +3,7 @@
 import React, { useState } from 'react'
 import clsx from 'clsx'
 
-const calendarIcon = 'http://localhost:3845/assets/2d34e5aece14cd8a8505c7260f6003a557b11b15.svg'
-const chevronDownIcon = 'http://localhost:3845/assets/aec11f4d66a5bdcdfe4eb5593e3cdea196a03ea4.svg'
+import { Calendar, ChevronDown } from 'lucide-react'
 
 interface ActivityMonthRowProps {
     month: string         // e.g. "APRIL 2026"
@@ -33,7 +32,7 @@ export default function ActivityMonthRow({
                 {/* Left: icon + month label */}
                 <div className="flex items-center gap-3">
                     <div className="flex p-2 rounded-lg bg-[#EFF6FF] shrink-0">
-                        <img src={calendarIcon} alt="" className="size-[18px]" />
+                        <Calendar className="size-[18px] text-[#155DFC]" />
                     </div>
                     <span
                         className="text-[12px] font-bold uppercase tracking-[-0.3px] text-[#314158] leading-4"
@@ -77,10 +76,8 @@ export default function ActivityMonthRow({
                             </span>
                         </div>
                     </div>
-                    <img
-                        src={chevronDownIcon}
-                        alt=""
-                        className={clsx('size-[18px] transition-transform duration-200', expanded && 'rotate-180')}
+                    <ChevronDown
+                        className={clsx('size-[18px] text-[#62748E] transition-transform duration-200', expanded && 'rotate-180')}
                     />
                 </div>
             </button>

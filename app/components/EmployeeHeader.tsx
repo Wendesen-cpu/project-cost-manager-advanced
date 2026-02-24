@@ -1,4 +1,4 @@
-const activityIconSvg = "http://localhost:3845/assets/c8a498d6ef13a3a0fdd044886b0de00cfdfb14d0.svg"
+import { LayoutDashboard } from 'lucide-react'
 
 interface EmployeeHeaderProps {
     userName?: string
@@ -36,7 +36,7 @@ export default function EmployeeHeader({ userName = 'Marco' }: EmployeeHeaderPro
             <div className="relative flex flex-col gap-3">
                 {/* Badge */}
                 <div className="inline-flex items-center gap-2 self-start rounded-full border border-[rgba(81,162,255,0.2)] bg-[rgba(43,127,255,0.2)] px-[13px] py-[5px] backdrop-blur-[4px]">
-                    <img src={activityIconSvg} alt="" className="size-3.5 shrink-0" />
+                    <LayoutDashboard className="size-3.5 shrink-0 text-[#51A2FF]" />
                     <span
                         className="text-[#BEDBFF] text-[12px] tracking-[0.6px] uppercase font-normal leading-4"
                         style={{ fontFamily: 'Arial, sans-serif' }}

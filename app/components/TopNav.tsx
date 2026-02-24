@@ -1,6 +1,6 @@
 'use client'
 
-const logoutIconSvg = "http://localhost:3845/assets/afa7cfbdf46ca8e7fe9141e2d11d2dcbf612ceba.svg"
+import { LogOut } from 'lucide-react'
 
 interface TopNavProps {
     onLogout?: () => void
@@ -55,7 +55,7 @@ export default function TopNav({ onLogout }: TopNavProps) {
                         onClick={onLogout}
                         className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     >
-                        <img src={logoutIconSvg} alt="" className="size-4 shrink-0" />
+                        <LogOut className="size-4 shrink-0 text-[#62748E]" />
                         <span
                             className="text-sm text-[#62748E] leading-5"
                             style={{ fontFamily: 'Arial, sans-serif' }}

@@ -1,7 +1,6 @@
 import React from 'react'
 
-const chevronLeftIcon = 'http://localhost:3845/assets/dc7c420875c8609bbf555917e41a7e1c1a49f461.svg'
-const chevronRightIcon = 'http://localhost:3845/assets/6006e30f9111e326af50f1ecb24b9838e89ce8bf.svg'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 const MONTH_NAMES = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -35,7 +34,7 @@ export default function CalendarHeader({ month, year, onPrev, onToday, onNext }:
                     className="flex items-center justify-center p-2 rounded-xl hover:bg-gray-100 transition-colors"
                     aria-label="Previous month"
                 >
-                    <img src={chevronLeftIcon} alt="" className="size-5" />
+                    <ChevronLeft className="size-5 text-[#62748E]" />
                 </button>
 
                 <button
@@ -53,7 +52,7 @@ export default function CalendarHeader({ month, year, onPrev, onToday, onNext }:
                     className="flex items-center justify-center p-2 rounded-xl hover:bg-gray-100 transition-colors"
                     aria-label="Next month"
                 >
-                    <img src={chevronRightIcon} alt="" className="size-5" />
+                    <ChevronRight className="size-5 text-[#62748E]" />
                 </button>
             </div>
         </div>
