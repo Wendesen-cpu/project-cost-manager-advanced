@@ -205,6 +205,25 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 - Hooked up an "Add Employee" button in the header directly to our `NewEmployeeModal`.
 - Added dynamic table refresh logic inside `useEffect` upon creation of a new employee via the modal.
 
+---
+
+### 2.6 Committed: `feat(ui): implement reusable project card and projects grid page`
+
+#### `app/components/admin/ProjectCard.tsx` *(new)*
+- Built a reusable card matching the Figma spec for projects.
+- Displays Title, dynamic ACTIVE/ARCHIVED badge (with light green `#dcfce7` background for active), and truncated descriptions.
+- Includes three inline rows with `lucide-react` icons for `startDate`, `paymentType` and `memberCount`.
+- Added a subtle `hover:-translate-y-1` transition scale effect for interactivity.
+
+#### `app/api/admin/projects/route.ts` *(modified)*
+- Added `_count: { select: { assignments: true } }` to the `GET` query to directly pass the member count to the UI card.
+
+#### `app/admin/projects/page.tsx` *(new)*
+- Created the main Admin Projects view aligned with the dashboard layout constraint (`max-w-7xl mx-auto`).
+- Added a client-side search input field (`<Search />` icon) filtering by project name and description.
+- Hooked up the "Add New Project" modal.
+- Rendered projects inside a fluid `grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6` layout.
+
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
 
 ## Step 4: AI Chat Integration — 🔜 Pending

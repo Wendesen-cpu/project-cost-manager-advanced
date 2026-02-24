@@ -8,6 +8,7 @@ export async function GET() {
                 assignments: {
                     include: { user: { select: { id: true, name: true, lastName: true } } },
                 },
+                _count: { select: { assignments: true } },
             },
         })
         return NextResponse.json(projects)
