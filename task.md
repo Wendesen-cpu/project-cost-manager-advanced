@@ -168,6 +168,28 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 
 ---
 
+---
+
+### 2.4 Committed: `feat: refine project modal and implement new employee modal with lucide icons`
+
+#### `app/components/admin/NewProjectModal.tsx` *(modified)*
+- Separated Payment Type and Fixed Cost Structure so they can be selected independently.
+- Dynamic placeholders and labels based on selection ("Hourly Rate" vs "Fixed Project Price").
+- Constrained project modal UI per Figma specs.
+
+#### `app/components/admin/NewEmployeeModal.tsx` *(new)*
+- Created form with fields: First/Last Name, Email, Password, Role (ADMIN/EMPLOYEE), Monthly Cost, Vacation Days.
+- Connected to the `POST /api/admin/employees` route to persist new employees.
+
+#### `app/admin/page.tsx` *(modified)*
+- Implemented horizontal constraints (`max-w-7xl mx-auto px-4 md:px-8`) for the main admin dashboard content.
+- Passed `lucide-react` icons to the `DashboardStatCard` components instead of using image URLs.
+- Rendered `NewEmployeeModal` and connected it to the Dashboard quick action button.
+
+#### `app/components/admin/Sidebar*.tsx` *(modified)*
+- Replaced all `localhost:3845` SVG assets across the Admin Sidebar (Logo, NavLinks, Footer) with equivalent vector icons from `lucide-react`.
+- `lucide-react` icons dynamically inherit active (`#155DFC` / white) and inactive (`#90A1B9`) color states.
+
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
 
 ## Step 4: AI Chat Integration — 🔜 Pending

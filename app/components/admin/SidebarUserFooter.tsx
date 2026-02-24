@@ -1,8 +1,7 @@
 'use client'
 
 import SidebarLanguageSwitcher from './SidebarLanguageSwitcher'
-
-const logoutIconSrc = 'http://localhost:3845/assets/f3e7e8be56b27df417759e48bd55d6da4f9e8097.svg'
+import { LogOut } from 'lucide-react'
 
 interface SidebarUserFooterProps {
     username?: string
@@ -42,16 +41,10 @@ export default function SidebarUserFooter({
                 {/* Logout button */}
                 <button
                     onClick={onLogout}
-                    className="flex items-center justify-center p-2 rounded-xl hover:bg-white/5 transition-colors shrink-0"
+                    className="flex text-[#62748E] hover:text-[#CAD5E2] items-center justify-center p-2 rounded-xl hover:bg-white/5 transition-colors shrink-0"
                     aria-label="Logout"
                 >
-                    <div className="relative size-5 shrink-0">
-                        <img
-                            src={logoutIconSrc}
-                            alt="logout"
-                            className="absolute inset-0 size-full block"
-                        />
-                    </div>
+                    <LogOut className="size-5" strokeWidth={2} />
                 </button>
             </div>
         </div>

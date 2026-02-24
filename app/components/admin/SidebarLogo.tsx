@@ -1,6 +1,6 @@
 'use client'
 
-const logoIconSrc = 'http://localhost:3845/assets/8e113705f296ea6081cc38e4b2525e9b0fdf663b.svg'
+import { Layers } from 'lucide-react'
 
 export default function SidebarLogo() {
     return (
@@ -23,11 +23,7 @@ export default function SidebarLogo() {
                             '0px 10px 15px -3px rgba(43, 127, 255, 0.2), 0px 4px 6px -4px rgba(43, 127, 255, 0.2)',
                     }}
                 />
-                <img
-                    src={logoIconSrc}
-                    alt="Project Pro logo"
-                    className="relative z-10 size-[22px] block"
-                />
+                <Layers className="relative z-10 size-[22px] text-white" strokeWidth={2.5} />
             </div>
 
             {/* Brand text */}

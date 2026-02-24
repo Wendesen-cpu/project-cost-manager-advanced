@@ -5,11 +5,11 @@ import Link from 'next/link'
 interface SidebarNavLinkProps {
     href: string
     label: string
-    iconSrc: string
+    icon: React.ReactNode
     isActive?: boolean
 }
 
-export default function SidebarNavLink({ href, label, iconSrc, isActive = false }: SidebarNavLinkProps) {
+export default function SidebarNavLink({ href, label, icon, isActive = false }: SidebarNavLinkProps) {
     return (
         <Link
             href={href}
@@ -33,12 +33,8 @@ export default function SidebarNavLink({ href, label, iconSrc, isActive = false 
             )}
 
             {/* Icon */}
-            <div className="relative shrink-0 size-5">
-                <img
-                    src={iconSrc}
-                    alt={`${label} icon`}
-                    className="absolute inset-0 size-full block"
-                />
+            <div className={`relative shrink-0 flex items-center justify-center size-5 ${isActive ? 'text-white' : 'text-[#90A1B9]'}`}>
+                {icon}
             </div>
 
             {/* Label */}

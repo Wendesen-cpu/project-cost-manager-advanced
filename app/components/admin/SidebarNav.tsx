@@ -2,33 +2,33 @@
 
 import { usePathname } from 'next/navigation'
 import SidebarNavLink from './SidebarNavLink'
+import { LayoutDashboard, Users, Briefcase, Target, Link as LinkIcon } from 'lucide-react'
 
-// SVG icons served from Figma's local asset server
 const NAV_ITEMS = [
     {
         href: '/admin',
         label: 'Dashboard',
-        iconSrc: 'http://localhost:3845/assets/d59a236f60900359fb54aec9bec22ba06c4b77da.svg',
+        icon: <LayoutDashboard className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/employees',
         label: 'Employees',
-        iconSrc: 'http://localhost:3845/assets/0690ba3c606b79f0e2e514b8e2c88457a3a347ba.svg',
+        icon: <Users className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/projects',
         label: 'Projects',
-        iconSrc: 'http://localhost:3845/assets/8f3fac0fd847db5714aba8674ffad3e418a1c8af.svg',
+        icon: <Briefcase className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/projections',
         label: 'Projections',
-        iconSrc: 'http://localhost:3845/assets/ae1c8c92bb57264cf90ad8db1815586898829c3b.svg',
+        icon: <Target className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/new-section',
         label: 'New Section',
-        iconSrc: 'http://localhost:3845/assets/21958c71a50eb5943ea5ccfead5df3f6cb1347af.svg',
+        icon: <LinkIcon className="size-full" strokeWidth={2} />,
     },
 ]
 
@@ -52,7 +52,7 @@ export default function SidebarNav() {
                         key={item.href}
                         href={item.href}
                         label={item.label}
-                        iconSrc={item.iconSrc}
+                        icon={item.icon}
                         isActive={isActive}
                     />
                 )

@@ -24,9 +24,17 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
     try {
-        const { name, lastName, email, password, monthlyCost, remainingVacationDays } = await req.json()
+        const { name, lastName, email, password, monthlyCost, remainingVacationDays, role } = await req.json()
         const newEmployee = await prisma.user.create({
-            data: { name, lastName, email, password, role: Role.EMPLOYEE, monthlyCost, remainingVacationDays },
+            data: {
+                name,
+                lastName,
+                email,
+                password,
+                role: role || Role.EMPLOYEE,
+                monthlyCost: monthlyCost ? parseFloat(monthlyCost) : null,
+                remainingVacationDays: remainingVacationDays ? parseInt(remainingVacationDays, 10) : 0
+            },
         })
         return NextResponse.json(newEmployee, { status: 201 })
     } catch {
