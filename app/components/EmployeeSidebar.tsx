@@ -3,6 +3,7 @@ import SectionHeader from './SectionHeader'
 import StatCard from './StatCard'
 import ActivityAccordion from './ActivityAccordion'
 import LogWorkForm from './LogWorkForm'
+import LogVacationForm from './LogVacationForm'
 
 export default function EmployeeSidebar() {
     const myStatsIcon = "http://localhost:3845/assets/09d5ea8b2151e09d5d1829e7ac874300f7221bd4.svg"
@@ -49,9 +50,7 @@ export default function EmployeeSidebar() {
                         iconSrc={logVacationIcon}
                         isLast={true}
                     >
-                        <div className="text-sm text-gray-500 py-4">
-                            Vacation logging form coming soon...
-                        </div>
+                        <LogVacationForm />
                     </ActivityAccordion>
                 </div>
             </section>
