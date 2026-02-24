@@ -24,10 +24,8 @@ export async function POST(req: NextRequest) {
         const body = await req.json()
         const logs = Array.isArray(body) ? body : [body]
         const results = []
-
         for (const log of logs) {
             const { userId, projectId, date, hours, type } = log
-
             if (type === TimeLogType.WORK) {
                 if (!projectId) {
                     return NextResponse.json({ error: 'projectId is required for WORK logs' }, { status: 400 })
@@ -41,6 +39,18 @@ export async function POST(req: NextRequest) {
                         return NextResponse.json({ error: 'User is not assigned to this project' }, { status: 403 })
                     }
                 }
+            } else if (type === TimeLogType.VACATION) {
+                const daysToDeduct = hours ? parseFloat(hours) / 8 : 1
+
+                const user = await prisma.user.findUnique({ where: { id: userId } })
+                if (!user || user.remainingVacationDays === null || user.remainingVacationDays < daysToDeduct) {
+                    return NextResponse.json({ error: 'Not enough vacation days remaining' }, { status: 400 })
+                }
+
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { remainingVacationDays: user.remainingVacationDays - daysToDeduct }
+                })
             }
 
             const newLog = await prisma.timeLog.create({
@@ -48,7 +58,7 @@ export async function POST(req: NextRequest) {
                     userId,
                     projectId: type === TimeLogType.WORK ? projectId : null,
                     date: new Date(date),
-                    hours: parseFloat(hours),
+                    hours: type === TimeLogType.VACATION ? (hours ? parseFloat(hours) : 8) : parseFloat(hours),
                     type,
                 },
             })

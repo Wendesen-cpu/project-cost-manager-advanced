@@ -1,29 +1,31 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import SectionHeader from './SectionHeader'
 import CalendarHeader from './CalendarHeader'
 import CalendarGrid from './CalendarGrid'
-import type { TimeLog } from './CalendarDayCell'
-
+// @ts-ignore
+import type { TimeLog } from '../../lib/generated/prisma'
 import { Calendar } from 'lucide-react'
-
-// Static sample logs matching the Figma (every weekday in Feb 2026 = 8h, "Food deli..." project)
-const SAMPLE_LOGS: Record<string, TimeLog[]> = (() => {
-    const logs: Record<string, TimeLog[]> = {}
-    // Feb 2026 weekdays: 2–6, 9–13 (done in Figma)
-    const weekdays = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-    weekdays.forEach(d => {
-        const key = `2026-02-${String(d).padStart(2, '0')}`
-        logs[key] = [{ projectName: 'Food delivery', hours: 8 }]
-    })
-    return logs
-})()
+import { usePortalData } from '../portal/PortalDataProvider'
 
 export default function MonthlyCalendar() {
-    const today = new Date(2026, 1, 20) // Feb 20 2026 (matches Figma)
+    const { timeLogs } = usePortalData()
+    const today = new Date() // Use actual today instead of mocked Figma today
     const [viewYear, setViewYear] = useState(today.getFullYear())
     const [viewMonth, setViewMonth] = useState(today.getMonth())
+
+    // Group logs by YYYY-MM-DD for the CalendarGrid
+    const groupedLogs = useMemo(() => {
+        const groups: Record<string, (TimeLog & { project?: { name: string } })[]> = {}
+        timeLogs.forEach(log => {
+            // log.date is an ISO string from our API (or Date object if fetched differently, but fetch returns string)
+            const dateStr = new Date(log.date).toISOString().split('T')[0]
+            if (!groups[dateStr]) groups[dateStr] = []
+            groups[dateStr].push(log as any) // Type casting since the fetch includes the project relation
+        })
+        return groups
+    }, [timeLogs])
 
     const goToPrev = () => {
         if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) }
@@ -52,7 +54,7 @@ export default function MonthlyCalendar() {
                 <CalendarGrid
                     year={viewYear}
                     month={viewMonth}
-                    logs={SAMPLE_LOGS}
+                    logs={groupedLogs}
                     today={today}
                 />
             </div>

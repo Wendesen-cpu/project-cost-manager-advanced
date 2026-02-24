@@ -4,10 +4,11 @@ import StatCard from './StatCard'
 import ActivityAccordion from './ActivityAccordion'
 import LogWorkForm from './LogWorkForm'
 import LogVacationForm from './LogVacationForm'
-
 import { BarChart2, Palmtree, Briefcase, Activity, Clock, Sun } from 'lucide-react'
+import { usePortalData } from '../portal/PortalDataProvider'
 
 export default function EmployeeSidebar() {
+    const { user, projects } = usePortalData()
 
     return (
         <div className="flex flex-col gap-8 w-full max-w-sm">
@@ -16,14 +17,14 @@ export default function EmployeeSidebar() {
                 <SectionHeader title="My Stats" icon={<BarChart2 className="size-[14px] text-[#62748E]" />} />
                 <StatCard
                     title="Vacation Remaining"
-                    value="18"
+                    value={user?.remainingVacationDays ?? '-'}
                     unit="Days"
                     icon={<Palmtree className="size-6 text-[#155DFC]" />}
                     iconBgColor="bg-[#EFF6FF]"
                 />
                 <StatCard
                     title="Assigned Projects"
-                    value="3"
+                    value={projects.length}
                     icon={<Briefcase className="size-6 text-[#62748E]" />}
                     iconBgColor="bg-[#F1F5F9]"
                 />

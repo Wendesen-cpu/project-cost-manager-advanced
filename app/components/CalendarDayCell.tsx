@@ -1,19 +1,19 @@
 import React from 'react'
 import clsx from 'clsx'
-
-export interface TimeLog {
-    projectName: string
-    hours: number
-}
+import { Trees } from 'lucide-react'
+// @ts-ignore
+import type { TimeLog } from '../../lib/generated/prisma'
 
 interface CalendarDayCellProps {
     day: number | null        // null = padding cell (outside month)
     isToday?: boolean
     isOtherMonth?: boolean
-    logs?: TimeLog[]
+    logs?: (TimeLog & { project?: { name: string } })[]
 }
 
 export default function CalendarDayCell({ day, isToday, isOtherMonth, logs = [] }: CalendarDayCellProps) {
+    const workLogs = logs.filter(l => l.type === 'WORK')
+
     return (
         <div
             className={clsx(
@@ -37,36 +37,56 @@ export default function CalendarDayCell({ day, isToday, isOtherMonth, logs = [] 
                             {day}
                         </div>
                         {/* Hours badge (top-right summary) */}
-                        {logs.length > 0 && (
+                        {workLogs.length > 0 && (
                             <span
                                 className="bg-[#EFF6FF] text-[#155DFC] text-[10px] font-bold px-[6px] py-[2px] rounded-md leading-[15px]"
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
-                                {logs.reduce((sum, l) => sum + l.hours, 0)}h
+                                {workLogs.reduce((sum, l) => sum + l.hours, 0)}h
                             </span>
                         )}
                     </div>
 
                     {/* Event chips */}
-                    {logs.map((log, i) => (
-                        <div
-                            key={i}
-                            className="flex items-center justify-between bg-[#EFF6FF] border border-[rgba(219,234,254,0.5)] rounded-[4px] px-[5px] py-[3px] overflow-hidden w-full"
-                        >
-                            <span
-                                className="text-[9px] text-[#1447E6] truncate leading-[11.25px] min-w-0"
-                                style={{ fontFamily: 'Arial, sans-serif' }}
+                    {logs.map((log, i) => {
+                        if (log.type === 'VACATION') {
+                            return (
+                                <div
+                                    key={i}
+                                    className="flex items-center gap-1 bg-[#FFF7ED] border border-[#FFEDD5] rounded-[4px] px-[5px] py-[3px] overflow-hidden w-full mt-1"
+                                >
+                                    <Trees className="size-[10px] text-[#EA580C] shrink-0" />
+                                    <span
+                                        className="text-[9px] font-bold text-[#EA580C] truncate leading-[11.25px] min-w-0"
+                                        style={{ fontFamily: 'Arial, sans-serif' }}
+                                    >
+                                        Vacation
+                                    </span>
+                                </div>
+                            )
+                        }
+
+                        // Work Log
+                        return (
+                            <div
+                                key={i}
+                                className="flex items-center justify-between bg-[#EFF6FF] border border-[rgba(219,234,254,0.5)] rounded-[4px] px-[5px] py-[3px] overflow-hidden w-full"
                             >
-                                {log.projectName}
-                            </span>
-                            <span
-                                className="text-[9px] font-bold text-[#1447E6] shrink-0 ml-1 leading-[11.25px]"
-                                style={{ fontFamily: 'Arial, sans-serif' }}
-                            >
-                                {log.hours}h
-                            </span>
-                        </div>
-                    ))}
+                                <span
+                                    className="text-[9px] text-[#1447E6] truncate leading-[11.25px] min-w-0"
+                                    style={{ fontFamily: 'Arial, sans-serif' }}
+                                >
+                                    {log.project?.name || 'Unknown Project'}
+                                </span>
+                                <span
+                                    className="text-[9px] font-bold text-[#1447E6] shrink-0 ml-1 leading-[11.25px]"
+                                    style={{ fontFamily: 'Arial, sans-serif' }}
+                                >
+                                    {log.hours}h
+                                </span>
+                            </div>
+                        )
+                    })}
                 </>
             )}
         </div>
