@@ -12,7 +12,7 @@ jobs:
   build-and-deploy:
     name: 'Build and Deploy'
     runs-on: ubuntu-latest
-    environment: production
+    environment: prod
     defaults:
       run:
         working-directory: .
