@@ -37,13 +37,18 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
 
+      - name: Create Optimized Package
+        run: |
+          # Exclude .next/cache to significantly reduce file size
+          tar -czf deploy.tar.gz --exclude='.next/cache' .next public package.json package-lock.json next.config.ts
+
       - name: Copy to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.AWS_EC2_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: ".next,public,package.json,package-lock.json,next.config.ts"
+          source: "deploy.tar.gz"
           target: "/home/ec2-user/app"
 
       - name: Finalize on EC2
@@ -55,6 +60,10 @@ jobs:
           timeout: 60s
           command_timeout: 30m
           script: |
+            cd /home/ec2-user/app
+            tar -xzf deploy.tar.gz
+            rm deploy.tar.gz
+
             # Upgrade Node.js if it's below v20
             if [[ $(node -v | cut -d'.' -f1) != "v20" ]]; then
               echo "Upgrading Node.js to v20..."
