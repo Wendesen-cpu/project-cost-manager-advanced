@@ -55,7 +55,16 @@ jobs:
           host: ${{ secrets.AWS_EC2_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 60s
+          command_timeout: 30m
           script: |
+            # Upgrade Node.js if it's below v20
+            if [[ $(node -v | cut -d'.' -f1) != "v20" ]]; then
+              echo "Upgrading Node.js to v20..."
+              curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+              sudo dnf install -y nodejs
+            fi
+
             cd /home/ec2-user/app
             tar -xzf deploy.tar.gz
             rm deploy.tar.gz
@@ -65,6 +74,6 @@ jobs:
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
             
-            npm install --production
+            npm install --omit=dev
             pm2 delete nextjs-app || true
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
