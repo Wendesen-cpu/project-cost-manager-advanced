@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import DashboardStatCard from '@/app/components/admin/DashboardStatCard'
 import DashboardQuickActions from '@/app/components/admin/DashboardQuickActions'
 import NewProjectModal from '@/app/components/admin/NewProjectModal'
-import NewEmployeeModal from '@/app/components/admin/NewEmployeeModal'
+import EmployeeModal from '@/app/components/admin/EmployeeModal'
 import { Briefcase, Users, Wallet } from 'lucide-react'
 
 interface DashboardStats {
@@ -43,8 +43,8 @@ export default function AdminDashboardPage() {
         fetchStats()
     }, [fetchStats])
 
-    // Called after a project is successfully created
-    const handleProjectCreated = () => {
+    // Called after a project/employee is successfully created
+    const handleDataCreated = () => {
         fetchStats()
     }
 
@@ -107,14 +107,14 @@ export default function AdminDashboardPage() {
                 <NewProjectModal
                     isOpen={isNewProjectOpen}
                     onClose={() => setIsNewProjectOpen(false)}
-                    onCreated={handleProjectCreated}
+                    onCreated={handleDataCreated}
                 />
 
                 {/* New Employee Modal */}
-                <NewEmployeeModal
+                <EmployeeModal
                     isOpen={isNewEmployeeOpen}
                     onClose={() => setIsNewEmployeeOpen(false)}
-                    onCreated={handleProjectCreated}
+                    onSuccess={handleDataCreated}
                 />
             </div>
         </div>

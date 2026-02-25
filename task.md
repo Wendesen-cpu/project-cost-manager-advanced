@@ -281,8 +281,14 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 - **Prisma Schema**: Added `SYSTEM_ADMIN` role.
 - **Database Reset**: Created script to wipe data and seed SystemAdmin from `.env`.
 - **Login API**: Implemented database-backed authentication.
-- **RBAC Rules**: Enforced creation limits (Admin cannot create Admin).
-- **Frontend Refinement**: Dynamic role selection in `NewEmployeeModal`.
+- **RBAC Rules**: 
+    - [x] Enforced creation limits (Admin cannot create Admin).
+    - [x] Extend RBAC to Update actions (Admin cannot update Admin).
+    - [x] Extend RBAC to Delete actions (Admin cannot delete Admin).
+- **Frontend Refinement**: 
+    - [x] Dynamic role selection in `NewEmployeeModal`.
+    - [x] Unified `EmployeeModal` for Create/Edit.
+    - [x] Dynamic row permissions in `AdminEmployeesPage`.
 - **Middleware Fix**: Updated `middleware.ts` to recognize `SYSTEM_ADMIN` and fixed redirect paths from `/login` to `/`.
 
 ---
