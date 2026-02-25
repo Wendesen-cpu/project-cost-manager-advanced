@@ -277,6 +277,14 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 - **Employee Login**: Styled login portal for employees.
 - **NextAuth Foundation**: Prepare for real authentication integration.
 
+### 3.2 Database Reset & RBAC Implementation
+- **Prisma Schema**: Added `SYSTEM_ADMIN` role.
+- **Database Reset**: Created script to wipe data and seed SystemAdmin from `.env`.
+- **Login API**: Implemented database-backed authentication.
+- **RBAC Rules**: Enforced creation limits (Admin cannot create Admin).
+- **Frontend Refinement**: Dynamic role selection in `NewEmployeeModal`.
+- **Middleware Fix**: Updated `middleware.ts` to recognize `SYSTEM_ADMIN` and fixed redirect paths from `/login` to `/`.
+
 ---
 
 ## Step 4: AI Chat Integration — 🔜 Pending

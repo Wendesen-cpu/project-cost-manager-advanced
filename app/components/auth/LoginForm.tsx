@@ -6,27 +6,55 @@ import Link from 'next/link'
 
 interface LoginFormProps {
     type: 'admin' | 'employee'
-    onSubmit: (email: string) => void
+    // Callback on successful login
+    onSuccess: (userData: any) => void
 }
 
-export default function LoginForm({ type, onSubmit }: LoginFormProps) {
+export default function LoginForm({ type, onSuccess }: LoginFormProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const isAdmin = type === 'admin'
     const accentColor = isAdmin ? '#0F172B' : '#2563EB'
-    const buttonHover = isAdmin ? '#1E293B' : '#1D4ED8'
     const icon = isAdmin ? <Shield className="text-white size-6" /> : <User className="text-white size-6" />
     const title = isAdmin ? 'ADMIN MANAGEMENT PANEL' : 'EMPLOYEE PERSONAL PORTAL'
     const subtitle = isAdmin ? 'System Administrator' : 'Welcome Back'
-    const buttonText = isAdmin ? 'LOGIN TO ADMIN' : 'LOGIN TO PORTAL'
+    const buttonText = loading ? 'SIGNING IN...' : (isAdmin ? 'LOGIN TO ADMIN' : 'LOGIN TO PORTAL')
     const switchText = isAdmin ? 'GO TO EMPLOYEE PORTAL' : 'GO TO ADMIN PANEL'
     const switchHref = isAdmin ? '/login/employee' : '/login/admin'
     const switchIcon = isAdmin ? <ArrowRight className="size-4" /> : <ArrowLeft className="size-4" />
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        onSubmit(email)
+        setLoading(true)
+        setError('')
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            })
+
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Login failed')
+
+            // Verify role matches the portal type
+            if (isAdmin && (data.role !== 'ADMIN' && data.role !== 'SYSTEM_ADMIN')) {
+                throw new Error('Access denied: Admin credentials required.')
+            }
+            if (!isAdmin && data.role !== 'EMPLOYEE') {
+                throw new Error('Access denied: Employee credentials required.')
+            }
+
+            onSuccess(data)
+        } catch (err: any) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -47,11 +75,18 @@ export default function LoginForm({ type, onSubmit }: LoginFormProps) {
                 </p>
             </div>
 
+            {/* Error Message */}
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-xs font-medium animate-in fade-in slide-in-from-top-2 duration-300">
+                    {error}
+                </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                     <label className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-widest ml-1">
-                        {isAdmin ? 'Admin Email' : 'Email Address'}
+                        {isAdmin ? 'Email Address' : 'Email Address'}
                     </label>
                     <div className="relative group">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-[#94A3B8] group-focus-within:text-[#2563EB] transition-colors" />
@@ -85,10 +120,11 @@ export default function LoginForm({ type, onSubmit }: LoginFormProps) {
 
                 <button
                     type="submit"
-                    className="w-full py-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-lg shadow-blue-500/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group"
+                    disabled={loading}
+                    className="w-full py-4 rounded-xl text-white font-bold text-sm tracking-wide shadow-lg shadow-blue-500/20 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none"
                     style={{ backgroundColor: accentColor }}
                 >
-                    <LogIn className="size-4 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    {!loading && <LogIn className="size-4 opacity-70 group-hover:opacity-100 transition-opacity" />}
                     {buttonText}
                 </button>
             </form>

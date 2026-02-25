@@ -136,7 +136,7 @@ export default function AdminEmployeesPage() {
                                             {/* Actions */}
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex justify-end gap-6 items-center">
-                                                    {emp.role === Role.ADMIN ? (
+                                                    {emp.role === Role.ADMIN || (emp.role as string) === 'SYSTEM_ADMIN' ? (
                                                         <span className="text-[#99a1af] text-sm italic">
                                                             No permission
                                                         </span>

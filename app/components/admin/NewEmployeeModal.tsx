@@ -15,6 +15,17 @@ export default function NewEmployeeModal({ isOpen, onClose, onCreated }: NewEmpl
     const [error, setError] = useState<string | null>(null)
     const overlayRef = useRef<HTMLDivElement>(null)
 
+    // Detect requester role (mock-auth)
+    const [requesterRole, setRequesterRole] = useState<string | null>(null)
+
+    useEffect(() => {
+        if (isOpen) {
+            const cookies = document.cookie.split('; ')
+            const roleCookie = cookies.find(row => row.startsWith('mock-role='))
+            setRequesterRole(roleCookie ? roleCookie.split('=')[1] : null)
+        }
+    }, [isOpen])
+
     const [form, setForm] = useState({
         name: '',
         lastName: '',
@@ -22,8 +33,10 @@ export default function NewEmployeeModal({ isOpen, onClose, onCreated }: NewEmpl
         password: '',
         monthlyCost: '',
         remainingVacationDays: '',
-        role: 'EMPLOYEE' as (typeof ROLES)[number],
+        role: 'EMPLOYEE'
     })
+
+    const isSystemAdmin = requesterRole === 'SYSTEM_ADMIN'
 
     // Close on overlay click
     const handleOverlayClick = (e: React.MouseEvent) => {
@@ -192,21 +205,22 @@ export default function NewEmployeeModal({ isOpen, onClose, onCreated }: NewEmpl
                             className="flex flex-col gap-4 rounded-xl border border-[#E5E7EB] p-4 mt-2"
                             style={{ backgroundColor: '#F8FAFC' }}
                         >
-                            <div className="flex flex-col gap-1.5">
-                                <label className={labelClass}>System Role <Required /></label>
-                                <select
-                                    required
-                                    name="role"
-                                    value={form.role}
-                                    onChange={handleChange}
-                                    className={inputClass}
-                                    style={{ backgroundColor: '#FFFFFF' }}
-                                >
-                                    {ROLES.map((r) => (
-                                        <option key={r} value={r}>{r}</option>
-                                    ))}
-                                </select>
-                            </div>
+                            {isSystemAdmin && (
+                                <div className="flex flex-col gap-1.5">
+                                    <label className={labelClass}>System Role <Required /></label>
+                                    <select
+                                        required
+                                        name="role"
+                                        value={form.role}
+                                        onChange={handleChange}
+                                        className={inputClass}
+                                        style={{ backgroundColor: '#FFFFFF' }}
+                                    >
+                                        <option value="EMPLOYEE">EMPLOYEE</option>
+                                        <option value="ADMIN">ADMIN</option>
+                                    </select>
+                                </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1.5">

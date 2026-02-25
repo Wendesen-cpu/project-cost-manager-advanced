@@ -24,6 +24,18 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const { name, lastName, email, password, monthlyCost, remainingVacationDays, role } = await req.json()
+
+        // RBAC Check
+        const requesterRole = req.cookies.get('mock-role')?.value
+
+        if (requesterRole === 'ADMIN' && role === 'ADMIN') {
+            return NextResponse.json({ error: 'Admins cannot create other Admins' }, { status: 403 })
+        }
+
+        if (requesterRole !== 'SYSTEM_ADMIN' && requesterRole !== 'ADMIN') {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+        }
+
         const newEmployee = await prisma.user.create({
             data: {
                 name,
@@ -36,7 +48,8 @@ export async function POST(req: NextRequest) {
             },
         })
         return NextResponse.json(newEmployee, { status: 201 })
-    } catch {
+    } catch (error) {
+        console.error('[Create Employee Error]:', error)
         return NextResponse.json({ error: 'Failed to create employee' }, { status: 500 })
     }
 }

@@ -16,21 +16,21 @@ export function middleware(request: NextRequest) {
     // Protect /admin routes
     if (pathname.startsWith('/admin')) {
         if (!isAuthenticated) {
-            return NextResponse.redirect(new URL('/login', request.url))
+            return NextResponse.redirect(new URL('/', request.url))
         }
-        if (mockRole !== 'ADMIN') {
+        if (mockRole !== 'ADMIN' && mockRole !== 'SYSTEM_ADMIN') {
             // Redirect to the appropriate portal or show an unauthorized page
-            return NextResponse.redirect(new URL('/login', request.url))
+            return NextResponse.redirect(new URL('/', request.url))
         }
     }
 
     // Protect /portal routes
     if (pathname.startsWith('/portal')) {
         if (!isAuthenticated) {
-            return NextResponse.redirect(new URL('/login', request.url))
+            return NextResponse.redirect(new URL('/', request.url))
         }
-        if (mockRole !== 'EMPLOYEE' && mockRole !== 'ADMIN') { // Assuming admins might also access the portal, adjust if not intended
-            return NextResponse.redirect(new URL('/login', request.url))
+        if (mockRole !== 'EMPLOYEE' && mockRole !== 'ADMIN' && mockRole !== 'SYSTEM_ADMIN') {
+            return NextResponse.redirect(new URL('/', request.url))
         }
     }
 
