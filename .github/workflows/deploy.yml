@@ -36,9 +36,6 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Create Deployment Package
-        run: |
-          tar -czf deploy.tar.gz .next public package.json package-lock.json next.config.ts
 
       - name: Copy to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -46,7 +43,7 @@ jobs:
           host: ${{ secrets.AWS_EC2_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deploy.tar.gz"
+          source: ".next,public,package.json,package-lock.json,next.config.ts"
           target: "/home/ec2-user/app"
 
       - name: Finalize on EC2
@@ -66,8 +63,6 @@ jobs:
             fi
 
             cd /home/ec2-user/app
-            tar -xzf deploy.tar.gz
-            rm deploy.tar.gz
             # Create/Update .env file on the server (single quotes to avoid shell expansion issues)
             echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" > .env
             echo "NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_EC2_IP }}:3000" >> .env
