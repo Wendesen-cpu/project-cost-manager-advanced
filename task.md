@@ -250,12 +250,13 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 #### `app/api/admin/projections/route.ts` *(new)*
 - API endpoint that aggregates all projects and assignments to project revenue/costs into a monthly time series.
 
-### 2.10 Committed: `fix: refine cost and margin calculations`
+### 2.10 Committed: `fix: refine cost and revenue calculations`
 
-#### `app/admin/projects/[id]/page.tsx` *(modified)*
-- **Estimated Cost**: Now calculated over the full assignment duration (working days × daily hours × hourly rate).
-- **Effective Cost**: Now considers actual logged hours × hourly rate, and strictly filters for logs within the project duration.
-- **Margin Split**: Divided the Margin stat card into "Effective Margin" and "Estimated Margin" with separate ROI percentages.
+#### `app/admin/projects/[id]/page.tsx` *(modified)* & `app/api/admin/projections/route.ts` *(modified)*
+- **Revenue Fix**: Correctly set `totalProjectPrice` as the revenue source. Previously, `totalFixedCost` was incorrectly being used as revenue for fixed-price projects.
+- **Cost Fix**: Included `totalFixedCost` as a project expense in both effective and estimated totals.
+- **Estimated Labor**: Now uses `(monthlyCost / 160) * dailyHours * workingDays` for more accurate projections.
+- **Projections API**: Fixed revenue/cost spreading logic to account for project duration and monthly vs. total fixed costs.
 
 ---
 

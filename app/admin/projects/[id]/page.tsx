@@ -104,19 +104,17 @@ function computeCosts(project: Project) {
         return logTime >= projStart && logTime <= projEnd
     })
 
-    // Effective cost: actual logged hours × hourly rate per user
-    // If employee logged 4h in a day, they cost (monthlyCost/160) × 4
-    const effectiveCost = validLogs.reduce((sum, log) => {
+    // Effective Labor Cost: actual logged hours × hourly rate per user
+    const effectiveLabor = validLogs.reduce((sum, log) => {
         const assignment = project.assignments.find((a) => a.userId === log.userId)
         const hourlyRate = (assignment?.user.monthlyCost ?? 0) / MONTHLY_HOURS
         return sum + log.hours * hourlyRate
     }, 0)
 
-    // Estimated cost: for each employee, compute their total cost over
+    // Estimated Labor Cost: for each employee, compute their total cost over
     // their full assignment period using working days × daily hours × hourly rate
-    const estimatedCost = project.assignments.reduce((sum, a) => {
+    const estimatedLabor = project.assignments.reduce((sum, a) => {
         const hourlyRate = (a.user.monthlyCost ?? 0) / MONTHLY_HOURS
-        // Assignment period: use assignment dates, fall back to project dates
         const aStart = a.startDate
             ? new Date(a.startDate)
             : project.startDate ? new Date(project.startDate) : new Date()
@@ -128,11 +126,22 @@ function computeCosts(project: Project) {
         return sum + hourlyRate * dailyHrs * workDays
     }, 0)
 
-    // Revenue = fixed price or totalProjectPrice
-    const revenue =
-        project.paymentType === PaymentType.FIXED
-            ? project.totalFixedCost ?? project.totalProjectPrice ?? 0
-            : project.totalProjectPrice ?? 0
+    // Fixed Costs
+    let fixedCostsAmount = project.totalFixedCost ?? 0
+    if (project.paymentType === PaymentType.FIXED && project.fixedCostType === FixedCostType.MONTHLY) {
+        if (project.startDate && project.endDate) {
+            const start = new Date(project.startDate)
+            const end = new Date(project.endDate)
+            const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1
+            fixedCostsAmount = (project.totalFixedCost ?? 0) * Math.max(months, 1)
+        }
+    }
+
+    const effectiveCost = effectiveLabor + fixedCostsAmount
+    const estimatedCost = estimatedLabor + fixedCostsAmount
+
+    // Revenue is the total price agreed with the client
+    const revenue = project.totalProjectPrice ?? 0
 
     const effectiveMargin = revenue - effectiveCost
     const estimatedMargin = revenue - estimatedCost

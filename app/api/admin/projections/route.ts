@@ -82,42 +82,51 @@ export async function GET() {
                 const overlaps = projectOverlapsMonth(project.startDate, project.endDate, year, monthIndex)
                 if (!overlaps) continue
 
+                // 1. Compute duration in months for spreading totals
+                let durationMonths = 1
+                if (project.startDate && project.endDate) {
+                    const start = new Date(project.startDate)
+                    const end = new Date(project.endDate)
+                    durationMonths = Math.max(1, (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1)
+                }
+
                 // --- Revenue ---
                 if (project.paymentType === 'FIXED') {
-                    if (project.fixedCostType === 'MONTHLY') {
-                        // totalFixedCost is the monthly amount
-                        revenue += project.totalFixedCost ?? 0
-                    } else {
-                        // TOTAL: spread evenly over project duration in months
-                        const projStart = project.startDate ?? new Date(year, monthIndex, 1)
-                        const projEnd = project.endDate ?? new Date(year, monthIndex + 1, 0)
-                        const totalMs = projEnd.getTime() - projStart.getTime()
-                        const durationMonths = Math.max(1, Math.round(totalMs / (1000 * 60 * 60 * 24 * 30)))
-                        revenue += (project.totalFixedCost ?? 0) / durationMonths
-                    }
+                    // Spread totalProjectPrice across the duration
+                    revenue += (project.totalProjectPrice ?? 0) / durationMonths
                 } else {
                     // HOURLY: totalProjectPrice is the hourly rate
-                    // Estimate hours for this month from working days or past logged avg
                     const hourlyRate = project.totalProjectPrice ?? 0
-
-                    // Use historical logs in this same month across all years as avg
-                    const logsThisMonthIdx = project.timeLogs.filter(
-                        (l) => new Date(l.date).getMonth() === monthIndex,
+                    // Estimate hours for this month
+                    const logsThisMonthIndex = project.timeLogs.filter(
+                        (l) => new Date(l.date).getMonth() === monthIndex && new Date(l.date).getFullYear() === year,
                     )
-                    if (logsThisMonthIdx.length > 0) {
-                        const totalHours = logsThisMonthIdx.reduce((s, l) => s + l.hours, 0)
-                        revenue += totalHours * hourlyRate
+                    if (logsThisMonthIndex.length > 0) {
+                        revenue += logsThisMonthIndex.reduce((s, l) => s + l.hours, 0) * hourlyRate
                     } else {
-                        // Estimate: 8h/day * working days * number of assigned employees
                         const wd = workingDaysInMonth(year, monthIndex)
-                        const assignedCount = project.assignments.length
-                        revenue += wd * 8 * assignedCount * hourlyRate
+                        const totalDailyHrs = project.assignments.reduce((s, a) => s + (a.dailyHours ?? 8), 0)
+                        revenue += wd * totalDailyHrs * hourlyRate
                     }
                 }
 
-                // --- Cost (employee monthly costs for this project) ---
+                // --- Cost: Labor ---
+                const wd = workingDaysInMonth(year, monthIndex)
+                const MONTHLY_HOURS = 160
                 for (const assignment of project.assignments) {
-                    cost += assignment.user.monthlyCost ?? 0
+                    const hourlyRate = (assignment.user.monthlyCost ?? 0) / MONTHLY_HOURS
+                    const projectDailyHrs = assignment.dailyHours ?? 8
+                    cost += wd * projectDailyHrs * hourlyRate
+                }
+
+                // --- Cost: Fixed expenses ---
+                if (project.totalFixedCost) {
+                    if (project.fixedCostType === 'MONTHLY') {
+                        cost += project.totalFixedCost
+                    } else {
+                        // Spread TOTAL over duration
+                        cost += project.totalFixedCost / durationMonths
+                    }
                 }
             }
 
