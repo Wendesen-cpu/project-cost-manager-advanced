@@ -38,7 +38,7 @@ jobs:
 
       - name: Create Deployment Package
         run: |
-          tar -czf deploy.tar.gz .next public package.json package-lock.json next.config.js
+          tar -czf deploy.tar.gz .next public package.json package-lock.json next.config.ts
 
       - name: Copy to EC2
         uses: appleboy/scp-action@v0.1.7
