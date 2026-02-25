@@ -6,8 +6,9 @@
 # Update system
 sudo dnf update -y
 
-# Install Node.js (Amazon Linux 2023 uses dnf)
-sudo dnf install -y nodejs npm
+# Install Node.js 20 (Using NodeSource for latest v20)
+curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+sudo dnf install -y nodejs
 
 # Install PM2 globally
 sudo npm install pm2 -g
