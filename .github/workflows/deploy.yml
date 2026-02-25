@@ -39,16 +39,25 @@ jobs:
 
       - name: Create Optimized Package
         run: |
+          echo "Checking directory sizes..."
+          du -sh .next public package.json
+          
           # Exclude .next/cache to significantly reduce file size
           tar -czf deploy.tar.gz --exclude='.next/cache' .next public package.json package-lock.json next.config.ts
-          echo "Package Size:"
+          
+          echo "Final Package Size:"
           ls -lh deploy.tar.gz
 
       - name: Copy to EC2 (Native SCP)
         run: |
+          echo "Checking Disk Space on GitHub Runner:"
+          df -h /
+          
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
           chmod 600 key.pem
-          scp -i key.pem -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.AWS_EC2_IP }}:/home/ec2-user/app/
+          
+          # Use faster cipher and disable compression (it's already gzipped) for speed
+          scp -i key.pem -o StrictHostKeyChecking=no -o Ciphers=aes128-ctr deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.AWS_EC2_IP }}:/home/ec2-user/app/
           rm key.pem
 
       - name: Finalize on EC2
