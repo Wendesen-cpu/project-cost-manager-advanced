@@ -1,7 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { Trees } from 'lucide-react'
-export type { TimeLog } from '@prisma/client'
+import type { TimeLog } from '@/lib/generated/prisma'
 
 interface CalendarDayCellProps {
     day: number | null        // null = padding cell (outside month)

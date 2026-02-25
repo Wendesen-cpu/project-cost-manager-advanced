@@ -4,8 +4,7 @@ import React, { useState, useMemo } from 'react'
 import SectionHeader from './SectionHeader'
 import CalendarHeader from './CalendarHeader'
 import CalendarGrid from './CalendarGrid'
-// @ts-ignore
-import type { TimeLog } from '../../lib/generated/prisma'
+import type { TimeLog } from '@/lib/generated/prisma'
 import { Calendar } from 'lucide-react'
 import { usePortalData } from '../portal/PortalDataProvider'
 

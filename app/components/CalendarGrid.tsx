@@ -1,5 +1,6 @@
 import React from 'react'
-import CalendarDayCell, { type TimeLog } from './CalendarDayCell'
+import CalendarDayCell from './CalendarDayCell'
+import type { TimeLog } from '@/lib/generated/prisma'
 
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
