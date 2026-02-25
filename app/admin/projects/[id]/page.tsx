@@ -126,9 +126,9 @@ function computeCosts(project: Project) {
         return sum + hourlyRate * dailyHrs * workDays
     }, 0)
 
-    // Fixed Costs
+    // Fixed Costs baseline (always added to both)
     let fixedCostsAmount = project.totalFixedCost ?? 0
-    if (project.paymentType === PaymentType.FIXED && project.fixedCostType === FixedCostType.MONTHLY) {
+    if (project.fixedCostType === FixedCostType.MONTHLY) {
         if (project.startDate && project.endDate) {
             const start = new Date(project.startDate)
             const end = new Date(project.endDate)
@@ -148,7 +148,7 @@ function computeCosts(project: Project) {
     const effectiveRoi = revenue > 0 ? ((effectiveMargin / revenue) * 100).toFixed(1) : '0.0'
     const estimatedRoi = revenue > 0 ? ((estimatedMargin / revenue) * 100).toFixed(1) : '0.0'
 
-    return { effectiveCost, estimatedCost, revenue, effectiveMargin, estimatedMargin, effectiveRoi, estimatedRoi }
+    return { effectiveCost, estimatedCost, revenue, effectiveMargin, estimatedMargin, effectiveRoi, estimatedRoi, fixedCostsAmount }
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -493,7 +493,16 @@ export default function ProjectDetailPage() {
         )
     }
 
-    const { effectiveCost, estimatedCost, revenue, effectiveMargin, estimatedMargin, effectiveRoi, estimatedRoi } = computeCosts(project)
+    const {
+        effectiveCost,
+        estimatedCost,
+        revenue,
+        effectiveMargin,
+        estimatedMargin,
+        effectiveRoi,
+        estimatedRoi,
+        fixedCostsAmount,
+    } = computeCosts(project)
     const totalWorkHours = project.timeLogs.reduce((s, l) => s + l.hours, 0)
 
     return (
@@ -585,6 +594,12 @@ export default function ProjectDetailPage() {
                                 <p className="text-xl font-bold text-[#0F172B]">{formatEuro(Math.round(estimatedCost))}</p>
                                 <p className="text-xs text-[#6A7282]">Full assignment duration × daily hours</p>
                             </div>
+                        </div>
+
+                        {/* Card Footer for Fixed Baseline */}
+                        <div className="mt-4 pt-3 border-t border-dashed border-[#E2E8F0] flex justify-between items-center">
+                            <span className="text-[10px] text-[#6A7282] uppercase tracking-[0.5px] font-bold">Fixed Baseline</span>
+                            <span className="text-xs font-bold text-[#0F172B]">{formatEuro(Math.round(fixedCostsAmount))}</span>
                         </div>
                     </StatCard>
 

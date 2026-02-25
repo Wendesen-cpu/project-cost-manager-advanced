@@ -112,11 +112,8 @@ export default function AdminProjectsPage() {
                                 // Fallback member count extraction if _count is missing for some reason
                                 const memberCount = proj._count?.assignments ?? proj.assignments?.length ?? 0
 
-                                // Determine the total value to show based on cost type
-                                const totalValue =
-                                    proj.paymentType === PaymentType.FIXED
-                                        ? proj.totalProjectPrice || proj.totalFixedCost
-                                        : null
+                                // Determine the total value (Revenue) to show
+                                const totalValue = proj.totalProjectPrice ?? 0
 
                                 return (
                                     <ProjectCard
