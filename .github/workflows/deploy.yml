@@ -1,24 +1,64 @@
-- name: Build
-        run: |
-          # If using Prisma, uncomment the next line:
-          # npx prisma generate 
-          npm run build
+name: 'Deploy Next.js App'
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: 'Build and Deploy'
+    runs-on: ubuntu-latest
+    environment: prod
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
         env:
-          DATABASE_URL: ${{ secrets.DB_HOST }} # Required if Prisma validates schema during build
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+
 
       - name: Create Optimized Package
         run: |
-          # Prune devDependencies to keep the package small
-          npm prune --omit=dev
+          echo "Checking directory sizes..."
+          du -sh .next public package.json
           
-          # Include node_modules so we don't have to install on EC2
-          tar -czf deploy.tar.gz .next public package.json node_modules next.config.ts
+          # Exclude .next/cache to significantly reduce file size
+          tar -czf deploy.tar.gz --exclude='.next/cache' .next public package.json package-lock.json next.config.ts
           
-          echo "Package Size:"
+          echo "Final Package Size:"
           ls -lh deploy.tar.gz
 
-      # ... (SCP step remains the same) ...
+      - name: Copy to EC2 (Native SCP)
+        run: |
+          echo "Checking Disk Space on GitHub Runner:"
+          df -h /
+          
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+          chmod 600 key.pem
+          
+          # Use faster cipher and disable compression (it's already gzipped) for speed
+          scp -i key.pem -o StrictHostKeyChecking=no -o Ciphers=aes128-ctr deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.AWS_EC2_IP }}:/home/ec2-user/app/
+          rm key.pem
 
       - name: Finalize on EC2
         uses: appleboy/ssh-action@v1.0.3
@@ -26,24 +66,39 @@
           host: ${{ secrets.AWS_EC2_IP }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          timeout: 60s
+          command_timeout: 30m
           script: |
+            echo "--- EC2 Health Check ---"
+            uptime
+            free -h
+            df -h
+
+            # Hot-fix: Enable swap if not already active (to help npm install)
+            if [ $(free | grep -i swap | awk '{print $2}') -eq 0 ]; then
+              echo "Enabling emergency swap..."
+              [ -f /swapfile ] || (sudo dd if=/dev/zero of=/swapfile bs=1M count=2048 && sudo chmod 600 /swapfile && sudo mkswap /swapfile)
+              sudo swapon /swapfile || true
+            fi
+
             cd /home/ec2-user/app
-            
-            # 1. Clean old files but KEEP the .env if it exists
-            find . -maxdepth 1 ! -name '.env' ! -name 'deploy.tar.gz' ! -name '.' -exec rm -rf {} +
-            
-            # 2. Extract new version
             tar -xzf deploy.tar.gz
             rm deploy.tar.gz
 
-            # 3. Securely recreate the .env
-            cat <<EOF > .env
-            DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}
-            NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_EC2_IP }}:3000
-            SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}
-            SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}
-            EOF
+            # Upgrade Node.js if it's below v20
+            if [[ $(node -v | cut -d'.' -f1) != "v20" ]]; then
+              echo "Upgrading Node.js to v20..."
+              curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+              sudo dnf install -y nodejs
+            fi
+
+            cd /home/ec2-user/app
+            # Create/Update .env file on the server (single quotes to avoid shell expansion issues)
+            echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" > .env
+            echo "NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_EC2_IP }}:3000" >> .env
+            echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
+            echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
             
-            # 4. Restart the app (No npm install needed here anymore!)
+            npm install --omit=dev
             pm2 delete nextjs-app || true
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
