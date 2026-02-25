@@ -12,7 +12,7 @@ jobs:
   build-and-deploy:
     name: 'Build and Deploy'
     runs-on: ubuntu-latest
-    environment: production # Manual approval step
+    # environment: production - Removed temporarily to debug secret scoping
     defaults:
       run:
         working-directory: .
@@ -30,6 +30,13 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Validate Secrets
+        run: |
+          if [ -z "${{ secrets.SSH_PRIVATE_KEY }}" ]; then echo "❌ SSH_PRIVATE_KEY is MISSING"; exit 1; fi
+          if [ -z "${{ secrets.AWS_EC2_IP }}" ]; then echo "❌ AWS_EC2_IP is MISSING"; exit 1; fi
+          if [ -z "${{ secrets.SSH_USERNAME }}" ]; then echo "❌ SSH_USERNAME is MISSING"; exit 1; fi
+          echo "✅ All required SSH secrets are present."
 
       - name: Build
         run: npm run build
