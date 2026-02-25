@@ -25,11 +25,6 @@ const NAV_ITEMS = [
         label: 'Projections',
         icon: <Target className="size-full" strokeWidth={2} />,
     },
-    {
-        href: '/admin/new-section',
-        label: 'New Section',
-        icon: <LinkIcon className="size-full" strokeWidth={2} />,
-    },
 ]
 
 export default function SidebarNav() {

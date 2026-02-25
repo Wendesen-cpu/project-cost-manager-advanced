@@ -258,6 +258,15 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 - **Labor costs**: Refined calculations for both Estimated (committed hours) and Effective (logged hours).
 - **Project List**: Updated the projects overview grid to show the correct revenue value per card.
 
+### 2.11 Committed: `fix: correct dashboard monthly revenue and sidebar cleanup`
+
+#### `app/api/admin/dashboard/stats/route.ts` *(modified)*
+- **Revenue Logic**: Replaced the incorrect employee-cost summation with a proper project-based revenue calculation.
+- **Monthly Spreading**: It now correctly spreads `totalProjectPrice` over the project duration and estimates hourly revenue based on assignments for the current month.
+
+#### `app/components/admin/SidebarNav.tsx` *(modified)*
+- **Sidebar Cleanup**: Removed the placeholder "New Section" link from the admin sidebar.
+
 ---
 
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
