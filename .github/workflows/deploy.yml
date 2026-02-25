@@ -12,7 +12,7 @@ jobs:
   build-and-deploy:
     name: 'Build and Deploy'
     runs-on: ubuntu-latest
-    # environment: production - Removed temporarily to debug secret scoping
+    environment: production
     defaults:
       run:
         working-directory: .
