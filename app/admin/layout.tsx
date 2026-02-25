@@ -9,7 +9,7 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
     const handleLogout = () => {
         document.cookie = 'mock-role=; Max-Age=0; path=/'
-        window.location.href = '/login'
+        window.location.href = '/'
     }
 
     return (

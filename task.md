@@ -269,6 +269,14 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 
 ---
 
-## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
+## Step 3: Authentication & Login Pages — 🔄 In Progress
+
+### 3.1 Implementing Landing and Login Pages
+- **Home Page**: Portal switcher for Admin and Employee.
+- **Admin Login**: Styled login portal for administrators.
+- **Employee Login**: Styled login portal for employees.
+- **NextAuth Foundation**: Prepare for real authentication integration.
+
+---
 
 ## Step 4: AI Chat Integration — 🔜 Pending

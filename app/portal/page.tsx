@@ -9,7 +9,7 @@ import { PortalDataProvider, usePortalData } from './PortalDataProvider'
 export default function EmployeePortal() {
     const handleLogout = () => {
         document.cookie = 'mock-role=; Max-Age=0; path=/'
-        window.location.href = '/login'
+        window.location.href = '/'
     }
 
     return (
