@@ -60,6 +60,18 @@ jobs:
           timeout: 60s
           command_timeout: 30m
           script: |
+            echo "--- EC2 Health Check ---"
+            uptime
+            free -h
+            df -h
+
+            # Hot-fix: Enable swap if not already active (to help npm install)
+            if [ $(free | grep -i swap | awk '{print $2}') -eq 0 ]; then
+              echo "Enabling emergency swap..."
+              [ -f /swapfile ] || (sudo dd if=/dev/zero of=/swapfile bs=1M count=2048 && sudo chmod 600 /swapfile && sudo mkswap /swapfile)
+              sudo swapon /swapfile || true
+            fi
+
             cd /home/ec2-user/app
             tar -xzf deploy.tar.gz
             rm deploy.tar.gz
