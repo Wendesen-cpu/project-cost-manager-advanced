@@ -71,11 +71,14 @@ model Project {
 }
 
 model ProjectAssignment {
-  id        String   @id @default(uuid())
-  userId    String
-  projectId String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id         String    @id @default(uuid())
+  userId     String
+  projectId  String
+  dailyHours Float     @default(8)
+  startDate  DateTime?
+  endDate    DateTime?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project    Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([userId, projectId])
 }

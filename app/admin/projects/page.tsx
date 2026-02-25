@@ -57,7 +57,7 @@ export default function AdminProjectsPage() {
     }, [projects, searchQuery])
 
     return (
-        <div className="w-full min-h-full bg-white">
+        <div className="w-full min-h-screen" style={{ backgroundColor: '#F8FAFC' }}>
             <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-16 py-12">
 
                 {/* Header row */}

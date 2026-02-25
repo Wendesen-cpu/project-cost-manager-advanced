@@ -4,19 +4,24 @@ import pg from 'pg'
 
 const connectionString = process.env.DATABASE_URL!
 
-const pool = new pg.Pool({ connectionString })
-const adapter = new PrismaPg(pool)
-
-const prismaClientSingleton = () => {
+const createPrismaClient = () => {
+  const pool = new pg.Pool({ connectionString })
+  const adapter = new PrismaPg(pool)
   return new PrismaClient({ adapter })
 }
 
 declare global {
-  var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>
+  var __prisma: undefined | PrismaClient
 }
 
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+// In development, always recreate the client to pick up schema changes.
+// The previous approach cached a stale client in globalThis.
+if (process.env.NODE_ENV !== 'production') {
+  if (!globalThis.__prisma) {
+    globalThis.__prisma = createPrismaClient()
+  }
+}
+
+const prisma = globalThis.__prisma ?? createPrismaClient()
 
 export default prisma
-
-if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma

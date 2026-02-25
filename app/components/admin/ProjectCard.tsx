@@ -44,8 +44,8 @@ export default function ProjectCard({
                 </h3>
                 <span
                     className={`shrink-0 border px-[11px] py-[5px] rounded-[6px] text-[10px] font-bold uppercase tracking-[0.5px] ${isArchived
-                            ? 'bg-gray-100 border-gray-200 text-gray-500'
-                            : 'bg-[#dcfce7] border-[#d0fae5] text-[#007a55]'
+                        ? 'bg-gray-100 border-gray-200 text-gray-500'
+                        : 'bg-[#dcfce7] border-[#d0fae5] text-[#007a55]'
                         }`}
                 >
                     {status}

@@ -20,46 +20,82 @@ export type ProjectAssignmentModel = runtime.Types.Result.DefaultSelection<Prism
 
 export type AggregateProjectAssignment = {
   _count: ProjectAssignmentCountAggregateOutputType | null
+  _avg: ProjectAssignmentAvgAggregateOutputType | null
+  _sum: ProjectAssignmentSumAggregateOutputType | null
   _min: ProjectAssignmentMinAggregateOutputType | null
   _max: ProjectAssignmentMaxAggregateOutputType | null
+}
+
+export type ProjectAssignmentAvgAggregateOutputType = {
+  dailyHours: number | null
+}
+
+export type ProjectAssignmentSumAggregateOutputType = {
+  dailyHours: number | null
 }
 
 export type ProjectAssignmentMinAggregateOutputType = {
   id: string | null
   userId: string | null
   projectId: string | null
+  dailyHours: number | null
+  startDate: Date | null
+  endDate: Date | null
 }
 
 export type ProjectAssignmentMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   projectId: string | null
+  dailyHours: number | null
+  startDate: Date | null
+  endDate: Date | null
 }
 
 export type ProjectAssignmentCountAggregateOutputType = {
   id: number
   userId: number
   projectId: number
+  dailyHours: number
+  startDate: number
+  endDate: number
   _all: number
 }
 
+
+export type ProjectAssignmentAvgAggregateInputType = {
+  dailyHours?: true
+}
+
+export type ProjectAssignmentSumAggregateInputType = {
+  dailyHours?: true
+}
 
 export type ProjectAssignmentMinAggregateInputType = {
   id?: true
   userId?: true
   projectId?: true
+  dailyHours?: true
+  startDate?: true
+  endDate?: true
 }
 
 export type ProjectAssignmentMaxAggregateInputType = {
   id?: true
   userId?: true
   projectId?: true
+  dailyHours?: true
+  startDate?: true
+  endDate?: true
 }
 
 export type ProjectAssignmentCountAggregateInputType = {
   id?: true
   userId?: true
   projectId?: true
+  dailyHours?: true
+  startDate?: true
+  endDate?: true
   _all?: true
 }
 
@@ -101,6 +137,18 @@ export type ProjectAssignmentAggregateArgs<ExtArgs extends runtime.Types.Extensi
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ProjectAssignmentAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ProjectAssignmentSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ProjectAssignmentMinAggregateInputType
@@ -131,6 +179,8 @@ export type ProjectAssignmentGroupByArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   _count?: ProjectAssignmentCountAggregateInputType | true
+  _avg?: ProjectAssignmentAvgAggregateInputType
+  _sum?: ProjectAssignmentSumAggregateInputType
   _min?: ProjectAssignmentMinAggregateInputType
   _max?: ProjectAssignmentMaxAggregateInputType
 }
@@ -139,7 +189,12 @@ export type ProjectAssignmentGroupByOutputType = {
   id: string
   userId: string
   projectId: string
+  dailyHours: number
+  startDate: Date | null
+  endDate: Date | null
   _count: ProjectAssignmentCountAggregateOutputType | null
+  _avg: ProjectAssignmentAvgAggregateOutputType | null
+  _sum: ProjectAssignmentSumAggregateOutputType | null
   _min: ProjectAssignmentMinAggregateOutputType | null
   _max: ProjectAssignmentMaxAggregateOutputType | null
 }
@@ -166,6 +221,9 @@ export type ProjectAssignmentWhereInput = {
   id?: Prisma.StringFilter<"ProjectAssignment"> | string
   userId?: Prisma.StringFilter<"ProjectAssignment"> | string
   projectId?: Prisma.StringFilter<"ProjectAssignment"> | string
+  dailyHours?: Prisma.FloatFilter<"ProjectAssignment"> | number
+  startDate?: Prisma.DateTimeNullableFilter<"ProjectAssignment"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"ProjectAssignment"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }
@@ -174,6 +232,9 @@ export type ProjectAssignmentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  dailyHours?: Prisma.SortOrder
+  startDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   project?: Prisma.ProjectOrderByWithRelationInput
 }
@@ -186,6 +247,9 @@ export type ProjectAssignmentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ProjectAssignmentWhereInput | Prisma.ProjectAssignmentWhereInput[]
   userId?: Prisma.StringFilter<"ProjectAssignment"> | string
   projectId?: Prisma.StringFilter<"ProjectAssignment"> | string
+  dailyHours?: Prisma.FloatFilter<"ProjectAssignment"> | number
+  startDate?: Prisma.DateTimeNullableFilter<"ProjectAssignment"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"ProjectAssignment"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
 }, "id" | "userId_projectId">
@@ -194,9 +258,14 @@ export type ProjectAssignmentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  dailyHours?: Prisma.SortOrder
+  startDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  endDate?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ProjectAssignmentCountOrderByAggregateInput
+  _avg?: Prisma.ProjectAssignmentAvgOrderByAggregateInput
   _max?: Prisma.ProjectAssignmentMaxOrderByAggregateInput
   _min?: Prisma.ProjectAssignmentMinOrderByAggregateInput
+  _sum?: Prisma.ProjectAssignmentSumOrderByAggregateInput
 }
 
 export type ProjectAssignmentScalarWhereWithAggregatesInput = {
@@ -206,10 +275,16 @@ export type ProjectAssignmentScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"ProjectAssignment"> | string
   userId?: Prisma.StringWithAggregatesFilter<"ProjectAssignment"> | string
   projectId?: Prisma.StringWithAggregatesFilter<"ProjectAssignment"> | string
+  dailyHours?: Prisma.FloatWithAggregatesFilter<"ProjectAssignment"> | number
+  startDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectAssignment"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableWithAggregatesFilter<"ProjectAssignment"> | Date | string | null
 }
 
 export type ProjectAssignmentCreateInput = {
   id?: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutAssignmentsInput
   project: Prisma.ProjectCreateNestedOneWithoutAssignmentsInput
 }
@@ -218,10 +293,16 @@ export type ProjectAssignmentUncheckedCreateInput = {
   id?: string
   userId: string
   projectId: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
 }
 
 export type ProjectAssignmentUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutAssignmentsNestedInput
   project?: Prisma.ProjectUpdateOneRequiredWithoutAssignmentsNestedInput
 }
@@ -230,22 +311,34 @@ export type ProjectAssignmentUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectAssignmentCreateManyInput = {
   id?: string
   userId: string
   projectId: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
 }
 
 export type ProjectAssignmentUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectAssignmentUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectAssignmentListRelationFilter = {
@@ -267,18 +360,35 @@ export type ProjectAssignmentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  dailyHours?: Prisma.SortOrder
+  startDate?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+}
+
+export type ProjectAssignmentAvgOrderByAggregateInput = {
+  dailyHours?: Prisma.SortOrder
 }
 
 export type ProjectAssignmentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  dailyHours?: Prisma.SortOrder
+  startDate?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
 }
 
 export type ProjectAssignmentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
+  dailyHours?: Prisma.SortOrder
+  startDate?: Prisma.SortOrder
+  endDate?: Prisma.SortOrder
+}
+
+export type ProjectAssignmentSumOrderByAggregateInput = {
+  dailyHours?: Prisma.SortOrder
 }
 
 export type ProjectAssignmentCreateNestedManyWithoutUserInput = {
@@ -365,14 +475,28 @@ export type ProjectAssignmentUncheckedUpdateManyWithoutProjectNestedInput = {
   deleteMany?: Prisma.ProjectAssignmentScalarWhereInput | Prisma.ProjectAssignmentScalarWhereInput[]
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ProjectAssignmentCreateWithoutUserInput = {
   id?: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutAssignmentsInput
 }
 
 export type ProjectAssignmentUncheckedCreateWithoutUserInput = {
   id?: string
   projectId: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
 }
 
 export type ProjectAssignmentCreateOrConnectWithoutUserInput = {
@@ -408,16 +532,25 @@ export type ProjectAssignmentScalarWhereInput = {
   id?: Prisma.StringFilter<"ProjectAssignment"> | string
   userId?: Prisma.StringFilter<"ProjectAssignment"> | string
   projectId?: Prisma.StringFilter<"ProjectAssignment"> | string
+  dailyHours?: Prisma.FloatFilter<"ProjectAssignment"> | number
+  startDate?: Prisma.DateTimeNullableFilter<"ProjectAssignment"> | Date | string | null
+  endDate?: Prisma.DateTimeNullableFilter<"ProjectAssignment"> | Date | string | null
 }
 
 export type ProjectAssignmentCreateWithoutProjectInput = {
   id?: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutAssignmentsInput
 }
 
 export type ProjectAssignmentUncheckedCreateWithoutProjectInput = {
   id?: string
   userId: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
 }
 
 export type ProjectAssignmentCreateOrConnectWithoutProjectInput = {
@@ -449,41 +582,65 @@ export type ProjectAssignmentUpdateManyWithWhereWithoutProjectInput = {
 export type ProjectAssignmentCreateManyUserInput = {
   id?: string
   projectId: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
 }
 
 export type ProjectAssignmentUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutAssignmentsNestedInput
 }
 
 export type ProjectAssignmentUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectAssignmentUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectAssignmentCreateManyProjectInput = {
   id?: string
   userId: string
+  dailyHours?: number
+  startDate?: Date | string | null
+  endDate?: Date | string | null
 }
 
 export type ProjectAssignmentUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutAssignmentsNestedInput
 }
 
 export type ProjectAssignmentUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ProjectAssignmentUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  dailyHours?: Prisma.FloatFieldUpdateOperationsInput | number
+  startDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  endDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -492,6 +649,9 @@ export type ProjectAssignmentSelect<ExtArgs extends runtime.Types.Extensions.Int
   id?: boolean
   userId?: boolean
   projectId?: boolean
+  dailyHours?: boolean
+  startDate?: boolean
+  endDate?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectAssignment"]>
@@ -500,6 +660,9 @@ export type ProjectAssignmentSelectCreateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   userId?: boolean
   projectId?: boolean
+  dailyHours?: boolean
+  startDate?: boolean
+  endDate?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectAssignment"]>
@@ -508,6 +671,9 @@ export type ProjectAssignmentSelectUpdateManyAndReturn<ExtArgs extends runtime.T
   id?: boolean
   userId?: boolean
   projectId?: boolean
+  dailyHours?: boolean
+  startDate?: boolean
+  endDate?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["projectAssignment"]>
@@ -516,9 +682,12 @@ export type ProjectAssignmentSelectScalar = {
   id?: boolean
   userId?: boolean
   projectId?: boolean
+  dailyHours?: boolean
+  startDate?: boolean
+  endDate?: boolean
 }
 
-export type ProjectAssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "projectId", ExtArgs["result"]["projectAssignment"]>
+export type ProjectAssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "projectId" | "dailyHours" | "startDate" | "endDate", ExtArgs["result"]["projectAssignment"]>
 export type ProjectAssignmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -542,6 +711,9 @@ export type $ProjectAssignmentPayload<ExtArgs extends runtime.Types.Extensions.I
     id: string
     userId: string
     projectId: string
+    dailyHours: number
+    startDate: Date | null
+    endDate: Date | null
   }, ExtArgs["result"]["projectAssignment"]>
   composites: {}
 }
@@ -970,6 +1142,9 @@ export interface ProjectAssignmentFieldRefs {
   readonly id: Prisma.FieldRef<"ProjectAssignment", 'String'>
   readonly userId: Prisma.FieldRef<"ProjectAssignment", 'String'>
   readonly projectId: Prisma.FieldRef<"ProjectAssignment", 'String'>
+  readonly dailyHours: Prisma.FieldRef<"ProjectAssignment", 'Float'>
+  readonly startDate: Prisma.FieldRef<"ProjectAssignment", 'DateTime'>
+  readonly endDate: Prisma.FieldRef<"ProjectAssignment", 'DateTime'>
 }
     
 

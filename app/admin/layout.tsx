@@ -18,7 +18,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <AdminSidebar onLogout={handleLogout} />
 
             {/* Scrollable main content area */}
-            <main className="flex-1 overflow-y-auto">
+            <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#F8FAFC' }}>
                 {children}
             </main>
         </div>

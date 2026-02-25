@@ -7,8 +7,23 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         const project = await prisma.project.findUnique({
             where: { id },
             include: {
+                owner: { select: { id: true, name: true, lastName: true, email: true } },
                 assignments: {
-                    include: { user: { select: { id: true, name: true, lastName: true } } },
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                lastName: true,
+                                role: true,
+                                monthlyCost: true,
+                            },
+                        },
+                    },
+                },
+                timeLogs: {
+                    where: { type: 'WORK' },
+                    select: { hours: true, userId: true, date: true },
                 },
             },
         })

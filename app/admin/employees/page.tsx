@@ -42,8 +42,8 @@ export default function AdminEmployeesPage() {
 
     return (
         <div
-            className="w-full min-h-full"
-            style={{ backgroundColor: '#FFFFFF' }}
+            className="w-full min-h-screen"
+            style={{ backgroundColor: '#F8FAFC' }}
         >
             <div className="flex flex-col gap-8 w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-16 py-12">
                 <div className="flex justify-between items-center w-full">

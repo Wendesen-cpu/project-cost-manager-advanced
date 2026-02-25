@@ -473,14 +473,6 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type EnumTimeLogTypeFieldUpdateOperationsInput = {
   set?: $Enums.TimeLogType
 }

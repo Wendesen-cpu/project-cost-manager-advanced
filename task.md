@@ -224,6 +224,41 @@ Basic Tailwind wireframes created — **intentionally minimal**, ready for Figma
 - Hooked up the "Add New Project" modal.
 - Rendered projects inside a fluid `grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6` layout.
 
+### 2.7 Committed: `feat(ui): implement project detail page with team management and financials`
+
+#### `app/admin/projects/[id]/page.tsx` *(new)*
+- Created a comprehensive detail view including Header, Stat Cards (Revenue, Costs, Margin, ROI), and Team Table.
+- Implemented "Add Member" functionality with `dailyHours`, `startDate`, and `endDate`.
+- Real-time financial calculations for Estimated vs. Effective performance.
+- Fixed Prisma client date validation issues by using raw SQL updates for assignment dates.
+- Added "Edit Details" modal for projects, allowing updates to all project fields.
+
+### 2.8 Committed: `feat(ui): implement project assignment gantt chart`
+
+#### `app/admin/projects/[id]/gantt/page.tsx` *(new)*
+- Built a custom SVG-based Gantt chart visualizing employee assignment timelines.
+- Prioritizes per-assignment `startDate`/`endDate`, falling back to project bounds.
+- Includes interactive tooltips showing assigned hours per day.
+
+### 2.9 Committed: `feat(ui): implement financial projections page`
+
+#### `app/admin/projections/page.tsx` *(new)*
+- Implemented a global financial projections view.
+- Visualizes monthly project revenue vs. cost trends using an SVG area chart.
+- Includes a data table showing monthly breakdowns of totals and individual project contributions.
+
+#### `app/api/admin/projections/route.ts` *(new)*
+- API endpoint that aggregates all projects and assignments to project revenue/costs into a monthly time series.
+
+### 2.10 Committed: `fix: refine cost and margin calculations`
+
+#### `app/admin/projects/[id]/page.tsx` *(modified)*
+- **Estimated Cost**: Now calculated over the full assignment duration (working days × daily hours × hourly rate).
+- **Effective Cost**: Now considers actual logged hours × hourly rate, and strictly filters for logs within the project duration.
+- **Margin Split**: Divided the Margin stat card into "Effective Margin" and "Estimated Margin" with separate ROI percentages.
+
+---
+
 ## Step 3: Authentication (NextAuth / JWT) — 🔜 Pending
 
 ## Step 4: AI Chat Integration — 🔜 Pending
