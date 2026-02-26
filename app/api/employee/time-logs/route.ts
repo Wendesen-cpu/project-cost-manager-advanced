@@ -13,7 +13,12 @@ export async function GET(req: NextRequest) {
             orderBy: { date: 'desc' },
             include: { project: { select: { name: true } } },
         })
-        return NextResponse.json(logs)
+        // Ensure dates are consistently formatted as ISO strings
+        const formattedLogs = logs.map(log => ({
+            ...log,
+            date: new Date(log.date).toISOString()
+        }))
+        return NextResponse.json(formattedLogs)
     } catch {
         return NextResponse.json({ error: 'Failed to fetch time logs' }, { status: 500 })
     }
@@ -53,14 +58,20 @@ export async function POST(req: NextRequest) {
                 })
             }
 
+            // Parse date string "YYYY-MM-DD" into date components
+            const [year, month, day] = date.split('-').map(Number)
+            // Create date at midnight UTC representing the calendar date
+            const dbDate = new Date(Date.UTC(year, month - 1, day))
+
             const newLog = await prisma.timeLog.create({
                 data: {
                     userId,
                     projectId: type === TimeLogType.WORK ? projectId : null,
-                    date: new Date(date),
+                    date: dbDate,
                     hours: type === TimeLogType.VACATION ? (hours ? parseFloat(hours) : 8) : parseFloat(hours),
                     type,
                 },
+                include: { project: { select: { name: true } } }
             })
             results.push(newLog)
         }

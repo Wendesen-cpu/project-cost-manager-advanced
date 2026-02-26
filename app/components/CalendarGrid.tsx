@@ -10,6 +10,8 @@ interface CalendarGridProps {
     // keyed by "YYYY-MM-DD" → array of logs for that day
     logs?: Record<string, TimeLog[]>
     today: Date
+    onAddLogClick?: (date: Date) => void
+    onDeleteLog?: (logId: string) => void
 }
 
 function buildCalendarMatrix(year: number, month: number) {
@@ -46,7 +48,7 @@ function buildCalendarMatrix(year: number, month: number) {
     return cells
 }
 
-export default function CalendarGrid({ year, month, logs = {}, today }: CalendarGridProps) {
+export default function CalendarGrid({ year, month, logs = {}, today, onAddLogClick, onDeleteLog }: CalendarGridProps) {
     const cells = buildCalendarMatrix(year, month)
     const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
@@ -87,6 +89,10 @@ export default function CalendarGrid({ year, month, logs = {}, today }: Calendar
                             isOtherMonth={cell.isOtherMonth}
                             isToday={isToday}
                             logs={cellLogs}
+                            year={year}
+                            month={month}
+                            onAddLogClick={onAddLogClick}
+                            onDeleteLog={onDeleteLog}
                         />
                     )
                 })}
