@@ -122,6 +122,10 @@ jobs:
               sudo dnf install -y nodejs
             fi
 
+            # Generate Prisma Client
+            echo "Generating Prisma Client..."
+            npx prisma generate
+
             # Seed the database
             echo "Running Prisma DB Seed..."
             npx prisma db seed
