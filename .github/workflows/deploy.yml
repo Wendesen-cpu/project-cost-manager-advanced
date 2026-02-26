@@ -43,7 +43,8 @@ jobs:
 
           tar -czf deploy.tar.gz \
             --exclude='.next/cache' \
-            .next public package.json package-lock.json next.config.ts
+            .next public package.json package-lock.json next.config.ts prisma.config.ts prisma
+
 
           echo "Final Package Size:"
           ls -lh deploy.tar.gz
