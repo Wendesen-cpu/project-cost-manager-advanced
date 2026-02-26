@@ -36,18 +36,14 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
-      - name: Prune dev dependencies
-        run: npm prune --omit=dev
-
       - name: Create Optimized Package
         run: |
           echo "Checking directory sizes..."
-          du -sh .next public package.json node_modules
+          du -sh .next public package.json
 
           tar -czf deploy.tar.gz \
             --exclude='.next/cache' \
-            --exclude='node_modules/.cache' \
-            .next public package.json package-lock.json next.config.ts node_modules
+            .next public package.json package-lock.json next.config.ts
 
           echo "Final Package Size:"
           ls -lh deploy.tar.gz
@@ -76,7 +72,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           timeout: 60s
-          command_timeout: 10m
+          command_timeout: 15m
           script: |
             set -e
             echo "--- EC2 Health Check ---"
@@ -84,9 +80,32 @@ jobs:
 
             cd /home/ec2-user/app
 
+            # Stop app FIRST to free RAM before anything else
+            pm2 delete nextjs-app || true
+
+            # Free page cache
+            sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' || true
+
+            echo "Memory after cleanup:"
+            free -h
+
+            # Extract new deployment
             echo "Extracting deployment..."
             tar -xzf deploy.tar.gz
             rm deploy.tar.gz
+
+            # Read hashes to decide if npm ci is needed
+            OLD_HASH=$(cat .pkg_hash 2>/dev/null || echo "")
+            NEW_HASH=$(sha256sum package.json | awk '{print $1}')
+
+            if [ "$NEW_HASH" != "$OLD_HASH" ]; then
+              echo "package.json changed — running npm ci..."
+              export NODE_OPTIONS="--max_old_space_size=384"
+              npm ci --omit=dev --prefer-offline --no-audit --no-fund
+              echo "$NEW_HASH" > .pkg_hash
+            else
+              echo "package.json unchanged — skipping npm install"
+            fi
 
             # Create/Update .env file
             echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" > .env
@@ -94,7 +113,7 @@ jobs:
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
 
-            # Enforce Node v20+ (Prisma requires >= 20.19)
+            # Enforce Node v20+
             NODE_MAJOR=$(node -v | cut -d'.' -f1 | tr -d 'v')
             if [ "$NODE_MAJOR" -lt 20 ]; then
               echo "Upgrading Node.js to v20..."
@@ -102,8 +121,10 @@ jobs:
               sudo dnf install -y nodejs
             fi
 
+            # Seed the database
             echo "Running Prisma DB Seed..."
             npx prisma db seed
 
-            pm2 delete nextjs-app || true
+            # Start app
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
+            pm2 save
