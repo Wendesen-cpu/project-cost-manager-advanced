@@ -21,7 +21,7 @@ export default function Home() {
                     Project Cost Manager
                 </h1>
                 <p className="text-[#64748B] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed font-medium">
-                    The ultimate suite for tracking project lifecycles, team costs, and
+                    Your ultimate suite for tracking project lifecycles, team costs, and
                     <span className="text-[#0F172B] font-bold"> real-time financial accuracy.</span>
                 </p>
             </div>
