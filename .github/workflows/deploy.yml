@@ -43,7 +43,7 @@ jobs:
 
           tar -czf deploy.tar.gz \
             --exclude='.next/cache' \
-            .next public package.json package-lock.json next.config.ts prisma.config.ts prisma
+            .next public package.json package-lock.json next.config.ts 
 
 
           echo "Final Package Size:"
@@ -122,13 +122,19 @@ jobs:
               sudo dnf install -y nodejs
             fi
 
-            # Generate Prisma Client
-            echo "Generating Prisma Client..."
-            npx prisma generate
-
-            # Seed the database
-            echo "Running Prisma DB Seed..."
-            npx prisma db seed
+            echo "Creating system admin if not exists..."
+            node --env-file=.env -e "
+            const { PrismaClient } = await import('@prisma/client');
+            const prisma = new PrismaClient();
+            const email = process.env.SYSTEM_ADMIN;
+            const password = process.env.SYSTEM_ADMIN_PASSPWORD;
+            if (!email || !password) { console.log('Skipping - env not set'); process.exit(0); }
+            const existing = await prisma.user.findUnique({ where: { email } });
+            if (existing) { console.log('Admin already exists'); await prisma.\$disconnect(); process.exit(0); }
+            await prisma.user.create({ data: { name: 'System', lastName: 'Admin', email, password, role: 'SYSTEM_ADMIN' } });
+            console.log('Admin created:', email);
+            await prisma.\$disconnect();
+            "
 
             # Start app
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
