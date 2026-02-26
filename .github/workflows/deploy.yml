@@ -45,7 +45,6 @@ jobs:
             --exclude='.next/cache' \
             .next public package.json package-lock.json next.config.ts prisma
 
-
           echo "Final Package Size:"
           ls -lh deploy.tar.gz
 
@@ -104,16 +103,12 @@ jobs:
               export NODE_OPTIONS="--max_old_space_size=384"
               npm ci --omit=dev --prefer-offline --no-audit --no-fund
               echo "$NEW_HASH" > .pkg_hash
-
-            
             else
               echo "package.json unchanged — skipping npm install"
-
-           
             fi
 
             # Create/Update .env file
-            echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" > .env
+            echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}?sslmode=require" > .env
             echo "NEXT_PUBLIC_API_URL=http://${{ secrets.AWS_EC2_IP }}:3000" >> .env
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
@@ -125,7 +120,7 @@ jobs:
               curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
               sudo dnf install -y nodejs
             fi
-             
+
             echo "Running seed..."
             node --env-file=.env prisma/seed.mjs
 
