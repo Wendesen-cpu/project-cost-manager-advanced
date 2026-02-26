@@ -43,7 +43,7 @@ jobs:
 
           tar -czf deploy.tar.gz \
             --exclude='.next/cache' \
-            .next public package.json package-lock.json next.config.ts 
+            .next public package.json package-lock.json next.config.ts prisma
 
 
           echo "Final Package Size:"
@@ -126,6 +126,8 @@ jobs:
               sudo dnf install -y nodejs
             fi
              
+            echo "Running seed..."
+            node --env-file=.env prisma/seed.mjs
 
             # Start app
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
