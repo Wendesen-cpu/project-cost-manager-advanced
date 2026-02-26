@@ -115,5 +115,16 @@ jobs:
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
 
+            # Enforce Node v20+ (Prisma ^7.4.1 requires >= 20.19)
+            if [[ $(node -v | cut -d'.' -f1) != "v20" && $(node -v | cut -d'.' -f1) != "v22" && $(node -v | cut -d'.' -f1) != "v24" ]]; then
+              echo "Upgrading Node.js to a compatible version..."
+              curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
+              sudo dnf install -y nodejs
+            fi
+
+            # Seed the database (safe to run on every deploy)
+            echo "Running Prisma DB Seed..."
+            npx prisma db seed
+
             pm2 delete nextjs-app || true
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
