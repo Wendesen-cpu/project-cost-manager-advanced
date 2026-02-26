@@ -90,7 +90,7 @@ jobs:
               npm ci --omit=dev --prefer-offline --no-audit --no-fund
               echo "$NEW_HASH" > .pkg_hash
             fi
-            echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}?sslmode=require" > .env
+            echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" > .env
             echo "NEXT_PUBLIC_API_URL=https://neosinternalprojects.dpdns.org" >> .env
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
