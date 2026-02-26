@@ -1,7 +1,10 @@
 import pg from 'pg'
 
 const { Pool } = pg
-const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false }
+})
 
 const email = process.env.SYSTEM_ADMIN
 const password = process.env.SYSTEM_ADMIN_PASSPWORD
