@@ -94,7 +94,19 @@ jobs:
 
             if [ "$NEW_HASH" != "$OLD_HASH" ]; then
               echo "package.json changed — running npm ci..."
-              npm ci --omit=dev
+
+              # Kill any stuck npm/node processes from previous failed runs
+              echo "Cleaning up stale processes..."
+              pkill -f "npm" || true
+              pkill -f "node" || true
+              sleep 2
+
+              # Drop cached memory to free up RAM before install
+              sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' || true
+
+              # Cap Node heap to 512MB so npm ci can't OOM the server
+              export NODE_OPTIONS="--max_old_space_size=512"
+              npm ci --omit=dev --prefer-offline || npm ci --omit=dev
               echo "$NEW_HASH" > .pkg_hash
             else
               echo "package.json unchanged — skipping npm install"
