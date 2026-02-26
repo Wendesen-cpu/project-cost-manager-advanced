@@ -95,10 +95,10 @@ jobs:
             if [ "$NEW_HASH" != "$OLD_HASH" ]; then
               echo "package.json changed — running npm ci..."
 
-              # Kill any stuck npm/node processes from previous failed runs
-              echo "Cleaning up stale processes..."
-              pkill -f "npm" || true
-              pkill -f "node" || true
+              # Kill only stale npm install/ci processes (NOT the SSH session)
+              echo "Cleaning up stale install processes..."
+              pkill -f "npm ci" || true
+              pkill -f "npm install" || true
               sleep 2
 
               # Drop cached memory to free up RAM before install
