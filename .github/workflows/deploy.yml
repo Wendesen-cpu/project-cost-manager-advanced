@@ -48,6 +48,13 @@ jobs:
           echo "Final Package Size:"
           ls -lh deploy.tar.gz
 
+      - name: Ensure Remote Directory Exists
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+          chmod 600 key.pem
+          ssh -i key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.AWS_EC2_IP }} "mkdir -p /home/ec2-user/app"
+          rm key.pem
+
       - name: Copy to EC2 (Native SCP)
         run: |
           echo "Checking Disk Space on GitHub Runner:"
