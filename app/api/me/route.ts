@@ -12,7 +12,8 @@ export async function GET(req: NextRequest) {
     try {
         const user = await prisma.user.findFirst({
             where: { role: Role.EMPLOYEE },
-            select: { id: true, name: true, lastName: true, email: true, remainingVacationDays: true }
+            select: { id: true, name: true, lastName: true, email: true, remainingVacationDays: true },
+            orderBy: { id: 'asc' } // Ensure consistent ordering - always return the same user
         })
 
         if (!user) {

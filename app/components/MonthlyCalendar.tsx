@@ -4,24 +4,42 @@ import React, { useState, useMemo } from 'react'
 import SectionHeader from './SectionHeader'
 import CalendarHeader from './CalendarHeader'
 import CalendarGrid from './CalendarGrid'
+import AddLogModal from './AddLogModal'
 import type { TimeLog } from '@/lib/generated/prisma'
 import { Calendar } from 'lucide-react'
 import { usePortalData } from '../portal/PortalDataProvider'
 
 export default function MonthlyCalendar() {
-    const { timeLogs } = usePortalData()
+    const { timeLogs, deleteLog } = usePortalData()
     const today = new Date() // Use actual today instead of mocked Figma today
     const [viewYear, setViewYear] = useState(today.getFullYear())
     const [viewMonth, setViewMonth] = useState(today.getMonth())
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
     // Group logs by YYYY-MM-DD for the CalendarGrid
     const groupedLogs = useMemo(() => {
         const groups: Record<string, (TimeLog & { project?: { name: string } })[]> = {}
         timeLogs.forEach(log => {
-            // log.date is an ISO string from our API (or Date object if fetched differently, but fetch returns string)
-            const dateStr = new Date(log.date).toISOString().split('T')[0]
+            // Extract YYYY-MM-DD date string consistently
+            let dateStr: string
+            const dateValue = log.date as unknown
+            
+            if (typeof dateValue === 'string') {
+                // If already a string, extract date part (handles ISO format)
+                dateStr = (dateValue as string).split('T')[0]
+            } else if (dateValue instanceof Date) {
+                // If Date object, extract date without timezone conversion
+                const d = dateValue as Date
+                dateStr = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+            } else {
+                // Convert to ISO string and extract date
+                const isoString = new Date(dateValue as string | number).toISOString()
+                dateStr = isoString.split('T')[0]
+            }
+            
             if (!groups[dateStr]) groups[dateStr] = []
-            groups[dateStr].push(log as any) // Type casting since the fetch includes the project relation
+            groups[dateStr].push(log as TimeLog & { project?: { name: string } })
         })
         return groups
     }, [timeLogs])
@@ -37,6 +55,16 @@ export default function MonthlyCalendar() {
     const goToToday = () => {
         setViewYear(today.getFullYear())
         setViewMonth(today.getMonth())
+    }
+
+    const handleAddLogClick = (date: Date) => {
+        setSelectedDate(date)
+        setIsModalOpen(true)
+    }
+
+    const handleDeleteLog = (logId: string) => {
+        // Optimistic update: remove log from state immediately
+        deleteLog(logId)
     }
 
     return (
@@ -55,8 +83,19 @@ export default function MonthlyCalendar() {
                     month={viewMonth}
                     logs={groupedLogs}
                     today={today}
+                    onAddLogClick={handleAddLogClick}
+                    onDeleteLog={handleDeleteLog}
                 />
             </div>
+
+            {/* Add Log Modal */}
+            {selectedDate && (
+                <AddLogModal
+                    isOpen={isModalOpen}
+                    date={selectedDate}
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
         </div>
     )
 }
