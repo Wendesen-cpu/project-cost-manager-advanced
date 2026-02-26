@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Clock, Trees, ArrowLeft, Palmtree } from "lucide-react";
+import { X, Clock, ArrowLeft, Palmtree } from "lucide-react";
 import clsx from "clsx";
 import { usePortalData } from "../portal/PortalDataProvider";
 
