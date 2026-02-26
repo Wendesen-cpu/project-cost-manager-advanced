@@ -63,8 +63,8 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
           chmod 600 key.pem
           
-          # Use faster cipher and disable compression (it's already gzipped) for speed
-          scp -i key.pem -o StrictHostKeyChecking=no -o Ciphers=aes128-ctr deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.AWS_EC2_IP }}:/home/ec2-user/app/
+          # SCP without cipher restriction for maximum compatibility
+          scp -i key.pem -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.SSH_USERNAME }}@${{ secrets.AWS_EC2_IP }}:/home/ec2-user/app/
           rm key.pem
 
       - name: Finalize on EC2
@@ -76,22 +76,26 @@ jobs:
           timeout: 60s
           command_timeout: 30m
           script: |
+            set -e
             echo "--- EC2 Health Check ---"
             uptime && free -h && df -h
 
             cd /home/ec2-user/app
 
-            # Only reinstall deps if package.json actually changed
-            NEW_HASH=$(sha256sum package.json 2>/dev/null | awk '{print $1}' || echo "none")
+            # Read the OLD hash before overwriting with new tarball
             OLD_HASH=$(cat .pkg_hash 2>/dev/null || echo "")
 
+            # Extract new deployment (overwrites package.json etc.)
             tar -xzf deploy.tar.gz
             rm deploy.tar.gz
+
+            # Now hash the NEWLY extracted package.json
+            NEW_HASH=$(sha256sum package.json | awk '{print $1}')
 
             if [ "$NEW_HASH" != "$OLD_HASH" ]; then
               echo "package.json changed — running npm ci..."
               npm ci --omit=dev
-              sha256sum package.json | awk '{print $1}' > .pkg_hash
+              echo "$NEW_HASH" > .pkg_hash
             else
               echo "package.json unchanged — skipping npm install"
             fi
