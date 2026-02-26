@@ -43,7 +43,7 @@ jobs:
 
           tar -czf deploy.tar.gz \
             --exclude='.next/cache' \
-            .next public package.json package-lock.json next.config.ts 
+            .next public package.json package-lock.json next.config.ts prisma
 
 
           echo "Final Package Size:"
@@ -104,8 +104,16 @@ jobs:
               export NODE_OPTIONS="--max_old_space_size=384"
               npm ci --omit=dev --prefer-offline --no-audit --no-fund
               echo "$NEW_HASH" > .pkg_hash
+
+              # Generate Prisma client after install
+              echo "Generating Prisma client..."
+              npx prisma generate --schema=prisma/schema.prisma
             else
               echo "package.json unchanged — skipping npm install"
+
+              # Always generate in case schema changed
+              echo "Generating Prisma client..."
+              npx prisma generate --schema=prisma/schema.prisma
             fi
 
             # Create/Update .env file
