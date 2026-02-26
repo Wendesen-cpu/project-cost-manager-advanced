@@ -129,20 +129,19 @@ jobs:
               curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
               sudo dnf install -y nodejs
             fi
-
-            echo "Creating system admin if not exists..."
-            node --env-file=.env -e "
-            const { PrismaClient } = await import('@prisma/client');
-            const prisma = new PrismaClient();
-            const email = process.env.SYSTEM_ADMIN;
-            const password = process.env.SYSTEM_ADMIN_PASSPWORD;
-            if (!email || !password) { console.log('Skipping - env not set'); process.exit(0); }
-            const existing = await prisma.user.findUnique({ where: { email } });
-            if (existing) { console.log('Admin already exists'); await prisma.\$disconnect(); process.exit(0); }
-            await prisma.user.create({ data: { name: 'System', lastName: 'Admin', email, password, role: 'SYSTEM_ADMIN' } });
-            console.log('Admin created:', email);
-            await prisma.\$disconnect();
-            "
+              echo "Creating system admin if not exists..."
+              node --env-file=.env -e "
+              const { Pool } = require('pg');
+              const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+              const email = process.env.SYSTEM_ADMIN;
+              const password = process.env.SYSTEM_ADMIN_PASSPWORD;
+              if (!email || !password) { console.log('Skipping - env not set'); pool.end(); process.exit(0); }
+              pool.query('SELECT id FROM \"User\" WHERE email = \$1', [email]).then(res => {
+                if (res.rows.length > 0) { console.log('Admin already exists'); pool.end(); return; }
+                return pool.query('INSERT INTO \"User\" (id, name, \"lastName\", email, password, role) VALUES (gen_random_uuid(), \$1, \$2, \$3, \$4, \$5)', ['System', 'Admin', email, password, 'SYSTEM_ADMIN'])
+                  .then(() => { console.log('Admin created:', email); pool.end(); });
+              }).catch(e => { console.error(e); pool.end(); process.exit(1); });
+              "
 
             # Start app
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
