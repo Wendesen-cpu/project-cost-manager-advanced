@@ -37,17 +37,14 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
 
-      - name: Install Production Dependencies (on runner)
-        run: npm ci --omit=dev
-
       - name: Create Optimized Package
         run: |
           echo "Checking directory sizes..."
-          du -sh .next public package.json node_modules
-          
-          # Bundle node_modules built on the runner so EC2 doesn't need to npm install
-          tar -czf deploy.tar.gz --exclude='.next/cache' .next public package.json next.config.ts node_modules
-          
+          du -sh .next public package.json
+
+          # Lightweight package — node_modules stay cached on EC2
+          tar -czf deploy.tar.gz --exclude='.next/cache' .next public package.json package-lock.json next.config.ts
+
           echo "Final Package Size:"
           ls -lh deploy.tar.gz
 
@@ -83,8 +80,21 @@ jobs:
             uptime && free -h && df -h
 
             cd /home/ec2-user/app
+
+            # Only reinstall deps if package.json actually changed
+            NEW_HASH=$(sha256sum package.json 2>/dev/null | awk '{print $1}' || echo "none")
+            OLD_HASH=$(cat .pkg_hash 2>/dev/null || echo "")
+
             tar -xzf deploy.tar.gz
             rm deploy.tar.gz
+
+            if [ "$NEW_HASH" != "$OLD_HASH" ]; then
+              echo "package.json changed — running npm ci..."
+              npm ci --omit=dev
+              sha256sum package.json | awk '{print $1}' > .pkg_hash
+            else
+              echo "package.json unchanged — skipping npm install"
+            fi
 
             # Create/Update .env file
             echo "DATABASE_URL=postgresql://${{ secrets.DB_USERNAME }}:${{ secrets.TF_VAR_db_password }}@${{ secrets.DB_HOST }}:5432/${{ secrets.DB_NAME }}" > .env
@@ -92,6 +102,5 @@ jobs:
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
 
-            # node_modules already included in tarball - no npm install needed
             pm2 delete nextjs-app || true
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
