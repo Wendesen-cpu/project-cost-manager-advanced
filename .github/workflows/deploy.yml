@@ -43,7 +43,7 @@ jobs:
 
           tar -czf deploy.tar.gz \
             --exclude='.next/cache' \
-            .next public package.json package-lock.json next.config.ts prisma
+            .next public package.json package-lock.json next.config.ts 
 
 
           echo "Final Package Size:"
@@ -105,15 +105,11 @@ jobs:
               npm ci --omit=dev --prefer-offline --no-audit --no-fund
               echo "$NEW_HASH" > .pkg_hash
 
-              # Generate Prisma client after install
-              echo "Generating Prisma client..."
-              npx prisma generate --schema=prisma/schema.prisma
+            
             else
               echo "package.json unchanged — skipping npm install"
 
-              # Always generate in case schema changed
-              echo "Generating Prisma client..."
-              npx prisma generate --schema=prisma/schema.prisma
+           
             fi
 
             # Create/Update .env file
@@ -129,19 +125,7 @@ jobs:
               curl -sL https://rpm.nodesource.com/setup_20.x | sudo bash -
               sudo dnf install -y nodejs
             fi
-              echo "Creating system admin if not exists..."
-              node --env-file=.env -e "
-              const { Pool } = require('pg');
-              const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-              const email = process.env.SYSTEM_ADMIN;
-              const password = process.env.SYSTEM_ADMIN_PASSPWORD;
-              if (!email || !password) { console.log('Skipping - env not set'); pool.end(); process.exit(0); }
-              pool.query('SELECT id FROM \"User\" WHERE email = \$1', [email]).then(res => {
-                if (res.rows.length > 0) { console.log('Admin already exists'); pool.end(); return; }
-                return pool.query('INSERT INTO \"User\" (id, name, \"lastName\", email, password, role) VALUES (gen_random_uuid(), \$1, \$2, \$3, \$4, \$5)', ['System', 'Admin', email, password, 'SYSTEM_ADMIN'])
-                  .then(() => { console.log('Admin created:', email); pool.end(); });
-              }).catch(e => { console.error(e); pool.end(); process.exit(1); });
-              "
+             
 
             # Start app
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
