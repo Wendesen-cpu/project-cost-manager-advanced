@@ -3,9 +3,11 @@ import SectionHeader from './SectionHeader'
 import ActivityMonthRow from './ActivityMonthRow'
 import { Activity } from 'lucide-react'
 import { usePortalData, type TimeLogWithProject } from '../portal/PortalDataProvider'
+import { useLanguage } from '../i18n'
 
 export default function RecentActivity() {
     const { timeLogs } = usePortalData()
+    const { t, language } = useLanguage()
 
     const activityData = useMemo(() => {
         const monthMap: Record<string, {
@@ -38,7 +40,7 @@ export default function RecentActivity() {
             .sort((a, b) => b.localeCompare(a))
             .map(key => {
                 const data = monthMap[key]
-                const monthName = data.monthDate.toLocaleString('default', { month: 'long', timeZone: 'UTC' }).toUpperCase()
+                const monthName = data.monthDate.toLocaleString(language === 'it' ? 'it-IT' : 'en-US', { month: 'long', timeZone: 'UTC' }).toUpperCase()
                 const year = data.monthDate.getUTCFullYear()
                 return {
                     month: `${monthName} ${year}`,
@@ -48,15 +50,15 @@ export default function RecentActivity() {
                     logs: data.logs,
                 }
             })
-    }, [timeLogs])
+    }, [timeLogs, language])
 
     return (
         <div className="flex flex-col gap-4">
-            <SectionHeader title="Recent Activity" icon={<Activity className="size-[14px] text-[#62748E]" />} />
+            <SectionHeader title={t('employeeDashboard.recentActivity')} icon={<Activity className="size-[14px] text-[#62748E]" />} />
             <div className="flex flex-col overflow-hidden rounded-2xl border border-[#E2E8F0]/60 bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
                 {activityData.length === 0 ? (
                     <div className="p-4 text-center text-sm text-[#62748E] font-medium" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        No recent activity found.
+                        {t('employeeDashboard.noActivity')}
                     </div>
                 ) : (
                     activityData.map((row, i) => (

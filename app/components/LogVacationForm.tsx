@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react'
 import { usePortalData } from '../portal/PortalDataProvider'
+import { useLanguage } from '../i18n'
 
 export default function LogVacationForm() {
     const { user, refreshData } = usePortalData()
+    const { t } = useLanguage()
     const today = new Date().toISOString().split('T')[0]
 
     const [date, setDate] = useState(today)
@@ -52,7 +54,7 @@ export default function LogVacationForm() {
                     className="text-[14px] text-[#314158] leading-5"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Date
+                    {t('common.date')}
                 </label>
                 <input
                     type="date"
@@ -73,7 +75,7 @@ export default function LogVacationForm() {
                     className="text-[16px] text-white leading-6"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    {loading ? 'Logging...' : 'Log Vacation Day'}
+                    {loading ? t('common.logging') : t('common.logVacation')}
                 </span>
             </button>
 
@@ -82,7 +84,7 @@ export default function LogVacationForm() {
                 className="text-[12px] text-[#64748B] leading-5"
                 style={{ fontFamily: 'Arial, sans-serif' }}
             >
-                Note: This will deduct 1 day from your balance.
+                {t('common.vacationNote')}
             </p>
         </form>
     )

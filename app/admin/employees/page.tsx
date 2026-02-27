@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Role } from '@lib/generated/prisma/enums'
 import EmployeeModal from '../../components/admin/EmployeeModal'
 import { Edit2, Trash2 } from 'lucide-react'
+import { useLanguage } from '@/app/i18n'
 
 // Adjust standard Role enum to match the table display
 type EmployeeData = {
@@ -17,6 +18,7 @@ type EmployeeData = {
 }
 
 export default function AdminEmployeesPage() {
+    const { t } = useLanguage()
     const [employees, setEmployees] = useState<EmployeeData[]>([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
@@ -80,14 +82,14 @@ export default function AdminEmployeesPage() {
                         className="text-[#0F172B] font-bold text-[30px] leading-9 tracking-[-0.75px]"
                         style={{ fontFamily: 'Arial, sans-serif' }}
                     >
-                        Employees
+                        {t('employees.title')}
                     </h1>
                     <button
                         onClick={handleAdd}
                         className="bg-[#155DFC] hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-500/10 transition-all flex items-center gap-2 group"
                     >
                         <Edit2 className="size-4 opacity-70 group-hover:opacity-100" />
-                        Add Employee
+                        {t('employees.addNew')}
                     </button>
                 </div>
 
@@ -98,22 +100,22 @@ export default function AdminEmployeesPage() {
                             <thead>
                                 <tr className="bg-[#f8fafc] border-b border-[#e2e8f0]">
                                     <th className="px-8 py-5 text-[10px] font-bold text-[#6a7282] uppercase tracking-[1px]">
-                                        Name
+                                        {t('common.name')}
                                     </th>
                                     <th className="px-8 py-5 text-[10px] font-bold text-[#6a7282] uppercase tracking-[1px]">
-                                        Role
+                                        {t('employees.role')}
                                     </th>
                                     <th className="px-8 py-5 text-[10px] font-bold text-[#6a7282] uppercase tracking-[1px]">
-                                        Email
+                                        {t('employees.email')}
                                     </th>
                                     <th className="px-8 py-5 text-[10px] font-bold text-[#6a7282] uppercase tracking-[1px]">
-                                        Monthly Cost (€)
+                                        {t('employees.monthlyCost')}
                                     </th>
                                     <th className="px-8 py-5 text-[10px] font-bold text-[#6a7282] uppercase tracking-[1px]">
-                                        Vacation Days (Remaining)
+                                        {t('employees.vacationDays')}
                                     </th>
                                     <th className="px-8 py-5 text-[10px] font-bold text-[#6a7282] uppercase tracking-[1px] text-right">
-                                        Actions
+                                        {t('employees.actions')}
                                     </th>
                                 </tr>
                             </thead>
@@ -123,14 +125,14 @@ export default function AdminEmployeesPage() {
                                         <td colSpan={6} className="px-8 py-12 text-center">
                                             <div className="flex flex-col items-center gap-3">
                                                 <div className="size-8 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin" />
-                                                <span className="text-xs font-bold text-[#94a3af] uppercase tracking-widest">Loading Personnel...</span>
+                                                <span className="text-xs font-bold text-[#94a3af] uppercase tracking-widest">{t('common.loading')}</span>
                                             </div>
                                         </td>
                                     </tr>
                                 ) : employees.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-8 py-12 text-center text-gray-400 font-medium">
-                                            No employees found in the directory.
+                                            {t('employees.noEmployees')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -152,7 +154,7 @@ export default function AdminEmployeesPage() {
                                                             ? 'bg-indigo-50 text-indigo-700 border border-indigo-100'
                                                             : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                                                         }`}>
-                                                        {emp.role}
+                                                        {emp.role === 'EMPLOYEE' ? t('employees.roleEmployee') : emp.role}
                                                     </span>
                                                 </td>
 

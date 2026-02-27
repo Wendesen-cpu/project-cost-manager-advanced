@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react'
 import { usePortalData } from '../portal/PortalDataProvider'
+import { useLanguage } from '../i18n'
 
 export default function LogWorkForm() {
     const { user, projects, refreshData } = usePortalData()
+    const { t } = useLanguage()
     const today = new Date().toISOString().split('T')[0]
 
     const [date, setDate] = useState(today)
@@ -51,7 +53,7 @@ export default function LogWorkForm() {
                     className="text-[14px] text-[#314158] leading-5"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Date
+                    {t('common.date')}
                 </label>
                 <input
                     type="date"
@@ -69,7 +71,7 @@ export default function LogWorkForm() {
                     className="text-[14px] text-[#314158] leading-5"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Project
+                    {t('common.project')}
                 </label>
                 {/* We use a select here to match the wireframe intent, styled similar to Figma */}
                 <select
@@ -79,7 +81,7 @@ export default function LogWorkForm() {
                     className="w-full rounded-md border border-[#CAD5E2] pl-[13px] pr-[36px] py-[9px] text-[16px] text-[#171717] outline-none focus:border-[#155DFC] focus:ring-1 focus:ring-[#155DFC] appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%207.5L10%2012.5L15%207.5%22%20stroke%3D%22%23314158%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:calc(100%-12px)_center]"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    <option value="" disabled>Select Project...</option>
+                    <option value="" disabled>{t('common.selectProject')}</option>
                     {projects.map(p => (
                         <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
@@ -92,7 +94,7 @@ export default function LogWorkForm() {
                     className="text-[14px] text-[#314158] leading-5"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Hours
+                    {t('common.hours')}
                 </label>
                 <input
                     type="number"
@@ -117,7 +119,7 @@ export default function LogWorkForm() {
                     className="text-[16px] text-white leading-6"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    {loading ? 'Logging...' : 'Log Hours'}
+                    {loading ? t('common.logging') : t('common.logHours')}
                 </span>
             </button>
         </form>

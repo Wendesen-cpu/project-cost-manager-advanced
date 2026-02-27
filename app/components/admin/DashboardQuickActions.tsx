@@ -1,6 +1,7 @@
 'use client'
 
 import { Plus } from 'lucide-react'
+import { useLanguage } from '../../i18n'
 
 interface DashboardQuickActionsProps {
     onNewProject: () => void
@@ -8,6 +9,8 @@ interface DashboardQuickActionsProps {
 }
 
 export default function DashboardQuickActions({ onNewProject, onNewEmployee }: DashboardQuickActionsProps) {
+    const { t } = useLanguage()
+
     return (
         <div
             className="flex flex-col gap-6 w-full rounded-2xl border border-solid p-[33px]"
@@ -26,7 +29,7 @@ export default function DashboardQuickActions({ onNewProject, onNewEmployee }: D
                     className="text-[#0F172B] font-bold text-xl leading-7 whitespace-nowrap"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Quick Actions
+                    {t('dashboard.quickActions')}
                 </span>
             </div>
 
@@ -43,7 +46,7 @@ export default function DashboardQuickActions({ onNewProject, onNewEmployee }: D
                     }}
                 >
                     <Plus className="size-[18px]" strokeWidth={2.5} />
-                    New Project
+                    {t('dashboard.newProject')}
                 </button>
 
                 {/* New Employee — Green */}
@@ -57,7 +60,7 @@ export default function DashboardQuickActions({ onNewProject, onNewEmployee }: D
                     }}
                 >
                     <Plus className="size-[18px]" strokeWidth={2.5} />
-                    New Employee
+                    {t('dashboard.newEmployee')}
                 </button>
             </div>
         </div>
