@@ -7,8 +7,9 @@ export default function AdminLoginPage() {
     const router = useRouter()
 
     const handleSuccess = (userData: any) => {
-        // Set mock role for middleware/layout awareness
+        // Store role for middleware/layout and userId to identify the logged-in user
         document.cookie = `mock-role=${userData.role}; path=/`
+        document.cookie = `user-id=${userData.id}; path=/`
         router.push('/admin')
     }
 

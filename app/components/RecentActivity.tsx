@@ -2,21 +2,26 @@ import React, { useMemo } from 'react'
 import SectionHeader from './SectionHeader'
 import ActivityMonthRow from './ActivityMonthRow'
 import { Activity } from 'lucide-react'
-import { usePortalData } from '../portal/PortalDataProvider'
+import { usePortalData, type TimeLogWithProject } from '../portal/PortalDataProvider'
 
 export default function RecentActivity() {
     const { timeLogs } = usePortalData()
 
     const activityData = useMemo(() => {
-        const monthMap: Record<string, { monthDate: Date, workHours: number, vacationHours: number }> = {}
+        const monthMap: Record<string, {
+            monthDate: Date
+            workHours: number
+            vacationHours: number
+            logs: TimeLogWithProject[]
+        }> = {}
 
         timeLogs.forEach(log => {
             const d = new Date(log.date)
-            // Group by YYYY-MM
-            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+            // Group by YYYY-MM so we get consistent month buckets
+            const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
 
             if (!monthMap[key]) {
-                monthMap[key] = { monthDate: d, workHours: 0, vacationHours: 0 }
+                monthMap[key] = { monthDate: d, workHours: 0, vacationHours: 0, logs: [] }
             }
 
             if (log.type === 'WORK') {
@@ -24,22 +29,25 @@ export default function RecentActivity() {
             } else if (log.type === 'VACATION') {
                 monthMap[key].vacationHours += log.hours
             }
+
+            monthMap[key].logs.push(log)
         })
 
-        // Convert map to array and sort descending by date
-        const sortedKeys = Object.keys(monthMap).sort((a, b) => b.localeCompare(a))
-
-        return sortedKeys.map(key => {
-            const data = monthMap[key]
-            const monthName = data.monthDate.toLocaleString('default', { month: 'long' }).toUpperCase()
-            const year = data.monthDate.getFullYear()
-            return {
-                month: `${monthName} ${year}`,
-                totalHours: data.workHours + data.vacationHours,
-                workHours: data.workHours,
-                vacationHours: data.vacationHours,
-            }
-        })
+        // Sort descending by month (newest first)
+        return Object.keys(monthMap)
+            .sort((a, b) => b.localeCompare(a))
+            .map(key => {
+                const data = monthMap[key]
+                const monthName = data.monthDate.toLocaleString('default', { month: 'long', timeZone: 'UTC' }).toUpperCase()
+                const year = data.monthDate.getUTCFullYear()
+                return {
+                    month: `${monthName} ${year}`,
+                    totalHours: data.workHours + data.vacationHours,
+                    workHours: data.workHours,
+                    vacationHours: data.vacationHours,
+                    logs: data.logs,
+                }
+            })
     }, [timeLogs])
 
     return (
@@ -58,6 +66,7 @@ export default function RecentActivity() {
                             totalHours={row.totalHours}
                             workHours={row.workHours}
                             vacationHours={row.vacationHours}
+                            logs={row.logs}
                             isLast={i === activityData.length - 1}
                         />
                     ))
