@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Pencil, X } from 'lucide-react'
 import { Role, ProjectStatus, PaymentType, FixedCostType } from '@lib/generated/prisma/enums'
+import { useLanguage } from '@/app/i18n'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AssignedUser {
@@ -153,10 +154,11 @@ function computeCosts(project: Project) {
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: ProjectStatus }) {
+    const { t } = useLanguage()
     const map: Record<ProjectStatus, { bg: string; text: string; border: string; label: string }> = {
-        ACTIVE: { bg: '#DCFCE7', text: '#007A55', border: '#D0FAE5', label: 'Active' },
-        PLANNED: { bg: '#EFF6FF', text: '#1D4ED8', border: '#BFDBFE', label: 'Planned' },
-        ARCHIVED: { bg: '#F1F5F9', text: '#475569', border: '#E2E8F0', label: 'Archived' },
+        ACTIVE: { bg: '#DCFCE7', text: '#007A55', border: '#D0FAE5', label: t('projects.statusActive') },
+        PLANNED: { bg: '#EFF6FF', text: '#1D4ED8', border: '#BFDBFE', label: t('projects.statusPlanned') },
+        ARCHIVED: { bg: '#F1F5F9', text: '#475569', border: '#E2E8F0', label: t('projects.statusArchived') },
     }
     const s = map[status] ?? map.PLANNED
     return (
@@ -200,6 +202,7 @@ function EditProjectModal({
     onClose: () => void
     onSaved: () => void
 }) {
+    const { t } = useLanguage()
     const [form, setForm] = useState({
         name: project.name,
         description: project.description ?? '',
@@ -259,7 +262,7 @@ function EditProjectModal({
             >
                 {/* Header */}
                 <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] rounded-t-xl">
-                    <h3 className="text-lg font-bold text-[#0F172B]">Edit Project</h3>
+                    <h3 className="text-lg font-bold text-[#0F172B]">{t('projects.editProject')}</h3>
                     <button
                         onClick={onClose}
                         className="text-[#6A7282] hover:text-[#0F172B] transition-colors"
@@ -272,13 +275,13 @@ function EditProjectModal({
                 <div className="px-6 py-5 flex flex-col gap-4">
                     {/* Name */}
                     <div className="flex flex-col">
-                        <label className={labelCls}>Project Name *</label>
+                        <label className={labelCls}>{t('projects.projectNameRequired')}</label>
                         <input value={form.name} onChange={(e) => set('name', e.target.value)} className={inputCls} />
                     </div>
 
                     {/* Description */}
                     <div className="flex flex-col">
-                        <label className={labelCls}>Description</label>
+                        <label className={labelCls}>{t('projects.description')}</label>
                         <textarea
                             value={form.description}
                             onChange={(e) => set('description', e.target.value)}
@@ -290,18 +293,18 @@ function EditProjectModal({
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col">
-                            <label className={labelCls}>Start Date</label>
+                            <label className={labelCls}>{t('projects.startDate')}</label>
                             <input type="date" value={form.startDate} onChange={(e) => set('startDate', e.target.value)} className={inputCls} />
                         </div>
                         <div className="flex flex-col">
-                            <label className={labelCls}>End Date</label>
+                            <label className={labelCls}>{t('projects.endDate')}</label>
                             <input type="date" value={form.endDate} onChange={(e) => set('endDate', e.target.value)} className={inputCls} />
                         </div>
                     </div>
 
                     {/* Status */}
                     <div className="flex flex-col">
-                        <label className={labelCls}>Status</label>
+                        <label className={labelCls}>{t('projects.status')}</label>
                         <select value={form.status} onChange={(e) => set('status', e.target.value)} className={inputCls}>
                             {Object.values(ProjectStatus).map((s) => (
                                 <option key={s} value={s}>{s}</option>
@@ -311,17 +314,17 @@ function EditProjectModal({
 
                     {/* Payment Type */}
                     <div className="flex flex-col">
-                        <label className={labelCls}>Payment Type</label>
+                        <label className={labelCls}>{t('projects.paymentType')}</label>
                         <select value={form.paymentType} onChange={(e) => set('paymentType', e.target.value)} className={inputCls}>
-                            {Object.values(PaymentType).map((t) => (
-                                <option key={t} value={t}>{t}</option>
+                            {Object.values(PaymentType).map((paymentType) => (
+                                <option key={paymentType} value={paymentType}>{paymentType === PaymentType.FIXED ? t('projects.fixedPrice') : t('projects.hourly')}</option>
                             ))}
                         </select>
                     </div>
 
                     {/* Price */}
                     <div className="flex flex-col">
-                        <label className={labelCls}>Total Project Price (€)</label>
+                        <label className={labelCls}>{t('projects.totalPrice')}</label>
                         <input
                             type="number"
                             value={form.totalProjectPrice}
@@ -335,7 +338,7 @@ function EditProjectModal({
                         <>
                             {/* Fixed Cost Type */}
                             <div className="flex flex-col">
-                                <label className={labelCls}>Fixed Cost Type</label>
+                                <label className={labelCls}>{t('projects.fixedCostType')}</label>
                                 <select value={form.fixedCostType} onChange={(e) => set('fixedCostType', e.target.value)} className={inputCls}>
                                     <option value="">None</option>
                                     {Object.values(FixedCostType).map((t) => (
@@ -346,7 +349,7 @@ function EditProjectModal({
 
                             {/* Total Fixed Cost */}
                             <div className="flex flex-col">
-                                <label className={labelCls}>Total Fixed Cost (€)</label>
+                                <label className={labelCls}>{t('projects.totalFixedCost')}</label>
                                 <input
                                     type="number"
                                     value={form.totalFixedCost}
@@ -367,7 +370,7 @@ function EditProjectModal({
                         onClick={onClose}
                         className="px-4 py-2 rounded-md text-sm font-medium text-[#6A7282] border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
                     >
-                        Cancel
+                        {t('projects.cancel')}
                     </button>
                     <button
                         onClick={handleSave}
@@ -375,7 +378,7 @@ function EditProjectModal({
                         className="px-4 py-2 rounded-md text-sm font-semibold text-white transition-colors disabled:opacity-50"
                         style={{ backgroundColor: '#4F39F6' }}
                     >
-                        {saving ? 'Saving…' : 'Save Changes'}
+                        {saving ? t('projects.savingChanges') : t('projects.saveChanges')}
                     </button>
                 </div>
             </div>
@@ -385,6 +388,7 @@ function EditProjectModal({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ProjectDetailPage() {
+    const { t } = useLanguage()
     const { id } = useParams<{ id: string }>()
     const router = useRouter()
 
@@ -411,11 +415,11 @@ export default function ProjectDetailPage() {
             const data: Project = await res.json()
             setProject(data)
         } catch {
-            setError('Could not load project data.')
+            setError(t('projects.couldNotLoadProjectData'))
         } finally {
             setLoading(false)
         }
-    }, [id])
+    }, [id, t])
 
     const fetchEmployees = useCallback(async () => {
         try {
@@ -515,7 +519,7 @@ export default function ProjectDetailPage() {
                     className="flex items-center gap-2 text-sm text-[#6A7282] hover:text-[#0F172B] transition-colors w-fit"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to Projects
+                    {t('projects.backToProjects')}
                 </button>
 
                 {/* ── Header Card ── */}
@@ -531,7 +535,7 @@ export default function ProjectDetailPage() {
                                         className="flex items-center gap-1.5 text-xs font-medium text-[#6A7282] border border-[#E2E8F0] rounded-md px-3 py-1.5 hover:bg-[#F8FAFC] transition-colors"
                                     >
                                         <Pencil className="w-3 h-3" />
-                                        Edit Details
+                                        {t('projects.editDetails')}
                                     </button>
                                     <button
                                         onClick={() => router.push(`/admin/projects/${project.id}/gantt`)}
@@ -541,7 +545,7 @@ export default function ProjectDetailPage() {
                                             <path d="M9 17H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v4" />
                                             <path d="M9 11h6M9 8h10M4 12h5M13 17l3 3 5-5" />
                                         </svg>
-                                        View Gantt
+                                        {t('projects.viewGantt')}
                                     </button>
                                 </div>
                                 {project.description && (
@@ -554,15 +558,15 @@ export default function ProjectDetailPage() {
                         {/* Metadata grid */}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 pt-4 border-t border-[#F1F5F9]">
                             {[
-                                { label: 'Start Date', value: formatDate(project.startDate) },
-                                { label: 'End Date', value: formatDate(project.endDate) },
-                                { label: 'Duration', value: computeDuration(project.startDate, project.endDate) },
-                                { label: 'Payment Type', value: project.paymentType === PaymentType.FIXED ? 'Fixed Price' : 'Hourly' },
+                                { label: t('projects.startDate'), value: formatDate(project.startDate) },
+                                { label: t('projects.endDate'), value: formatDate(project.endDate) },
+                                { label: t('projects.duration'), value: computeDuration(project.startDate, project.endDate) },
+                                { label: t('projects.paymentType'), value: project.paymentType === PaymentType.FIXED ? t('projects.fixedPrice') : t('projects.hourly') },
                                 {
-                                    label: 'Price',
+                                    label: t('projects.price'),
                                     value: revenue > 0 ? formatEuro(revenue) : '—',
                                 },
-                                { label: 'Owner', value: `${project.owner.name} ${project.owner.lastName}` },
+                                { label: t('projects.owner'), value: `${project.owner.name} ${project.owner.lastName}` },
                             ].map(({ label, value }) => (
                                 <div key={label} className="flex flex-col gap-0.5">
                                     <p className="text-xs text-[#6A7282]">{label}</p>
@@ -576,56 +580,56 @@ export default function ProjectDetailPage() {
                 {/* ── Stat Cards ── */}
                 <div className="flex gap-4 flex-col md:flex-row">
                     {/* Revenue */}
-                    <StatCard accent="#4F39F6" title="Estimated Total Revenue">
+                    <StatCard accent="#4F39F6" title={t('projects.estimatedTotalRevenue')}>
                         <p className="text-2xl font-bold text-[#0F172B]">{formatEuro(revenue)}</p>
                     </StatCard>
 
                     {/* Costs */}
-                    <StatCard accent="#EF4444" title="Project Costs">
+                    <StatCard accent="#EF4444" title={t('projects.projectCosts')}>
                         <div className="flex flex-col gap-3">
                             <div>
-                                <p className="text-xs text-[#6A7282] mb-0.5">Effective Total Cost</p>
+                                <p className="text-xs text-[#6A7282] mb-0.5">{t('projects.effectiveTotalCost')}</p>
                                 <p className="text-xl font-bold text-[#0F172B]">{formatEuro(Math.round(effectiveCost))}</p>
-                                <p className="text-xs text-[#6A7282]">Based on {totalWorkHours.toFixed(0)}h actually logged</p>
+                                <p className="text-xs text-[#6A7282]">{t('projects.basedOnHoursLogged').replace('{hours}', totalWorkHours.toFixed(0))}</p>
                             </div>
                             <div className="border-t border-[#E2E8F0]" />
                             <div>
-                                <p className="text-xs text-[#6A7282] mb-0.5">Estimated Total Cost</p>
+                                <p className="text-xs text-[#6A7282] mb-0.5">{t('projects.estimatedTotalCost')}</p>
                                 <p className="text-xl font-bold text-[#0F172B]">{formatEuro(Math.round(estimatedCost))}</p>
-                                <p className="text-xs text-[#6A7282]">Full assignment duration × daily hours</p>
+                                <p className="text-xs text-[#6A7282]">{t('projects.durationAndHours')}</p>
                             </div>
                         </div>
 
                         {/* Card Footer for Fixed Baseline */}
                         <div className="mt-4 pt-3 border-t border-dashed border-[#E2E8F0] flex justify-between items-center">
-                            <span className="text-[10px] text-[#6A7282] uppercase tracking-[0.5px] font-bold">Fixed Baseline</span>
+                            <span className="text-[10px] text-[#6A7282] uppercase tracking-[0.5px] font-bold">{t('projects.fixedBaseline')}</span>
                             <span className="text-xs font-bold text-[#0F172B]">{formatEuro(Math.round(fixedCostsAmount))}</span>
                         </div>
                     </StatCard>
 
                     {/* Margin */}
-                    <StatCard accent="#10B981" title="Margin">
+                    <StatCard accent="#10B981" title={t('projects.margin')}>
                         <div className="flex flex-col gap-3">
                             <div>
-                                <p className="text-xs text-[#6A7282] mb-0.5">Effective Margin</p>
+                                <p className="text-xs text-[#6A7282] mb-0.5">{t('projects.effectiveMargin')}</p>
                                 <p
                                     className="text-xl font-bold"
                                     style={{ color: effectiveMargin >= 0 ? '#007A55' : '#EF4444' }}
                                 >
                                     {formatEuro(Math.round(effectiveMargin))}
                                 </p>
-                                <p className="text-xs text-[#6A7282]">ROI: {effectiveRoi}%</p>
+                                <p className="text-xs text-[#6A7282]">{t('projects.roiLabel').replace('{roi}', effectiveRoi)}</p>
                             </div>
                             <div className="border-t border-[#E2E8F0]" />
                             <div>
-                                <p className="text-xs text-[#6A7282] mb-0.5">Estimated Margin</p>
+                                <p className="text-xs text-[#6A7282] mb-0.5">{t('projects.estimatedMargin')}</p>
                                 <p
                                     className="text-xl font-bold"
                                     style={{ color: estimatedMargin >= 0 ? '#007A55' : '#EF4444' }}
                                 >
                                     {formatEuro(Math.round(estimatedMargin))}
                                 </p>
-                                <p className="text-xs text-[#6A7282]">ROI: {estimatedRoi}%</p>
+                                <p className="text-xs text-[#6A7282]">{t('projects.roiLabel').replace('{roi}', estimatedRoi)}</p>
                             </div>
                         </div>
                     </StatCard>
@@ -634,19 +638,19 @@ export default function ProjectDetailPage() {
                 {/* ── Team Section ── */}
                 <div className="bg-white rounded-lg border border-[#E2E8F0] overflow-hidden">
                     <div className="px-6 py-4 border-b border-[#E2E8F0]">
-                        <h2 className="text-base font-bold text-[#0F172B]">Team</h2>
+                        <h2 className="text-base font-bold text-[#0F172B]">{t('projects.team')}</h2>
                     </div>
 
                     {/* Add Member Form */}
                     <div className="px-6 py-4 border-b border-[#F1F5F9] bg-[#F8FAFC] flex flex-wrap items-end gap-4">
                         <div className="flex flex-col gap-1">
-                            <label className="text-xs text-[#6A7282]">Member</label>
+                            <label className="text-xs text-[#6A7282]">{t('projects.memberTableHeader')}</label>
                             <select
                                 value={selectedUserId}
                                 onChange={(e) => setSelectedUserId(e.target.value)}
                                 className="border border-[#E2E8F0] rounded-md px-3 py-2 text-sm text-[#0F172B] bg-white outline-none focus:border-[#4F39F6] min-w-[200px]"
                             >
-                                <option value="">Select employee…</option>
+                                <option value="">{t('projects.selectEmployee')}</option>
                                 {unassignedEmployees.map((emp) => (
                                     <option key={emp.id} value={emp.id}>
                                         {emp.name} {emp.lastName}
@@ -656,7 +660,7 @@ export default function ProjectDetailPage() {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-xs text-[#6A7282]">Daily Hours</label>
+                            <label className="text-xs text-[#6A7282]">{t('projects.dailyHrs')}</label>
                             <input
                                 type="number"
                                 min={1}
@@ -668,7 +672,7 @@ export default function ProjectDetailPage() {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-xs text-[#6A7282]">Start Date</label>
+                            <label className="text-xs text-[#6A7282]">{t('projects.startDate')}</label>
                             <input
                                 type="date"
                                 value={assignmentStart}
@@ -676,12 +680,12 @@ export default function ProjectDetailPage() {
                                 min={project?.startDate?.split('T')[0] || ''}
                                 max={project?.endDate?.split('T')[0] || ''}
                                 className="border border-[#E2E8F0] rounded-md px-3 py-2 text-sm text-[#0F172B] bg-white outline-none focus:border-[#4F39F6] w-36"
-                                placeholder="Optional"
+                                placeholder={t('common.optional')}
                             />
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <label className="text-xs text-[#6A7282]">End Date</label>
+                            <label className="text-xs text-[#6A7282]">{t('projects.endDate')}</label>
                             <input
                                 type="date"
                                 value={assignmentEnd}
@@ -689,7 +693,7 @@ export default function ProjectDetailPage() {
                                 min={assignmentStart || project?.startDate?.split('T')[0] || ''}
                                 max={project?.endDate?.split('T')[0] || ''}
                                 className="border border-[#E2E8F0] rounded-md px-3 py-2 text-sm text-[#0F172B] bg-white outline-none focus:border-[#4F39F6] w-36"
-                                placeholder="Optional"
+                                placeholder={t('common.optional')}
                             />
                         </div>
 
@@ -699,7 +703,7 @@ export default function ProjectDetailPage() {
                             className="px-4 py-2 rounded-md text-sm font-semibold text-white transition-colors disabled:opacity-50"
                             style={{ backgroundColor: '#0F172B' }}
                         >
-                            {addingMember ? 'Adding…' : 'Add Member'}
+                            {addingMember ? t('projects.addingMember') : t('projects.addMember')}
                         </button>
                     </div>
 
@@ -708,7 +712,7 @@ export default function ProjectDetailPage() {
                         <table className="w-full border-collapse min-w-[600px]">
                             <thead>
                                 <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-                                    {['Name', 'Role', 'Daily Hours', 'Dates', 'Monthly Cost', 'Actions'].map((h) => (
+                                    {[t('projects.tableHeaderName'), t('projects.tableHeaderRole'), t('projects.tableHeaderDailyHours'), t('projects.tableHeaderDates'), t('projects.tableHeaderMonthlyCost'), t('projects.tableHeaderActions')].map((h) => (
                                         <th
                                             key={h}
                                             className="text-left px-6 py-3 text-xs font-normal text-[#6A7282] uppercase tracking-[0.6px]"
@@ -722,7 +726,7 @@ export default function ProjectDetailPage() {
                                 {project.assignments.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} className="px-6 py-8 text-center text-sm text-[#6A7282] italic">
-                                            No team members assigned yet.
+                                            {t('projects.noTeamMembersAssigned')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -740,17 +744,17 @@ export default function ProjectDetailPage() {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-[#0F172B] font-medium">
-                                                {a.dailyHours}h / day
+                                                {a.dailyHours}{t('projects.hoursPerDay')}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-[#6A7282]">
                                                 {a.startDate || a.endDate ? (
                                                     <>
-                                                        {a.startDate ? formatDate(a.startDate) : 'Start'}
+                                                        {a.startDate ? formatDate(a.startDate) : t('projects.start')}
                                                         {' – '}
-                                                        {a.endDate ? formatDate(a.endDate) : 'End'}
+                                                        {a.endDate ? formatDate(a.endDate) : t('projects.end')}
                                                     </>
                                                 ) : (
-                                                    'Project Duration'
+                                                    t('projects.projectDuration')
                                                 )}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-[#6A7282]">
@@ -762,7 +766,7 @@ export default function ProjectDetailPage() {
                                                     disabled={removingId === a.userId}
                                                     className="text-sm font-medium text-[#E7000B] hover:text-red-800 transition-colors disabled:opacity-50"
                                                 >
-                                                    {removingId === a.userId ? 'Removing…' : 'Remove'}
+                                                    {removingId === a.userId ? t('projects.removing') : t('projects.remove')}
                                                 </button>
                                             </td>
                                         </tr>

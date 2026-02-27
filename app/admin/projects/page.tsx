@@ -5,6 +5,7 @@ import { PlusCircle, Search } from 'lucide-react'
 import ProjectCard from '../../components/admin/ProjectCard'
 import NewProjectModal from '../../components/admin/NewProjectModal'
 import { ProjectStatus, PaymentType } from '@lib/generated/prisma/enums'
+import { useLanguage } from '@/app/i18n'
 
 type RawProjectFromApi = {
     id: string
@@ -22,6 +23,7 @@ type RawProjectFromApi = {
 }
 
 export default function AdminProjectsPage() {
+    const { t } = useLanguage()
     const [projects, setProjects] = useState<RawProjectFromApi[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [searchQuery, setSearchQuery] = useState('')
@@ -67,10 +69,10 @@ export default function AdminProjectsPage() {
                             className="text-[#0F172B] font-bold text-[30px] leading-9 tracking-[-0.75px]"
                             style={{ fontFamily: 'Arial, sans-serif' }}
                         >
-                            Projects
+                            {t('projects.title')}
                         </h1>
                         <p className="text-[#6a7282] text-[16px] leading-6" style={{ fontFamily: 'Arial, sans-serif' }}>
-                            Manage and track company active projects
+                            {t('projects.pageDescription')}
                         </p>
                     </div>
 
@@ -80,7 +82,7 @@ export default function AdminProjectsPage() {
                     >
                         <PlusCircle className="w-5 h-5 text-white" strokeWidth={2} />
                         <span className="font-bold text-[14px]" style={{ fontFamily: 'Arial, sans-serif' }}>
-                            Add New Project
+                            {t('projects.addNew')}
                         </span>
                     </button>
                 </div>
@@ -92,7 +94,7 @@ export default function AdminProjectsPage() {
                     </div>
                     <input
                         type="text"
-                        placeholder="Search projects..."
+                        placeholder={t('projects.search')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-[41px] pr-[17px] py-[15px] border border-[#e2e8f0] rounded-[12px] text-[#171717] text-[14px] outline-none focus:border-[#155dfc] transition-colors placeholder:text-[#171717]/50"
@@ -103,9 +105,9 @@ export default function AdminProjectsPage() {
                 {/* Grid */}
                 <div className="w-full mt-2">
                     {isLoading ? (
-                        <p className="text-[#6a7282] italic">Loading projects...</p>
+                        <p className="text-[#6a7282] italic">{t('projects.loading')}</p>
                     ) : filteredProjects.length === 0 ? (
-                        <p className="text-[#6a7282] italic">No projects found.</p>
+                        <p className="text-[#6a7282] italic">{t('projects.noProjectsFound')}</p>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full items-start">
                             {filteredProjects.map((proj) => {

@@ -1,10 +1,13 @@
 import { LayoutDashboard } from 'lucide-react'
+import { useLanguage } from '../i18n'
 
 interface EmployeeHeaderProps {
     userName?: string
 }
 
 export default function EmployeeHeader({ userName = 'Marco' }: EmployeeHeaderProps) {
+    const { t } = useLanguage()
+
     return (
         <div
             className="relative overflow-hidden rounded-3xl p-12 shadow-[0px_25px_50px_-12px_rgba(28,57,142,0.2)] w-full"
@@ -41,7 +44,7 @@ export default function EmployeeHeader({ userName = 'Marco' }: EmployeeHeaderPro
                         className="text-[#BEDBFF] text-[12px] tracking-[0.6px] uppercase font-normal leading-4"
                         style={{ fontFamily: 'Arial, sans-serif' }}
                     >
-                        Employee Dashboard
+                        {t('employeeDashboard.title')}
                     </span>
                 </div>
 
@@ -50,7 +53,7 @@ export default function EmployeeHeader({ userName = 'Marco' }: EmployeeHeaderPro
                     className="text-[48px] font-bold leading-[48px] tracking-[-1.2px] text-white whitespace-nowrap mt-2"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Welcome,{' '}
+                    {t('employeeDashboard.welcome')},{' '}
                     <span
                         className="bg-gradient-to-r from-[#51A2FF] to-[#00D492] bg-clip-text"
                         style={{ WebkitTextFillColor: 'transparent' }}
@@ -68,7 +71,7 @@ export default function EmployeeHeader({ userName = 'Marco' }: EmployeeHeaderPro
                         lineHeight: '29.25px',
                     }}
                 >
-                    Manage your time, request vacations, and track your projects with ease.
+                    {t('employeeDashboard.subtitle')}
                 </p>
             </div>
         </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useLanguage } from '@/app/i18n'
 
 interface Employee {
     id: string
@@ -19,6 +20,7 @@ const FIXED_COST_TYPES = ['TOTAL', 'MONTHLY'] as const
 const PROJECT_STATUSES = ['PLANNED', 'ACTIVE', 'ARCHIVED'] as const
 
 export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProjectModalProps) {
+    const { t } = useLanguage()
     const [employees, setEmployees] = useState<Employee[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -135,13 +137,13 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                                 className="text-[#0F172B] font-bold text-lg leading-6"
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
-                                New Project
+                                {t('projects.newProjectTitle')}
                             </h2>
                             <p
                                 className="text-[#6A7282] text-xs leading-4"
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
-                                Fill in the project details below
+                                {t('projects.fillDetails')}
                             </p>
                         </div>
                     </div>
@@ -166,25 +168,25 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
 
                     {/* Name */}
                     <div className="flex flex-col gap-1.5">
-                        <label className={labelClass}>Project Name <Required /></label>
+                        <label className={labelClass}>{t('projects.nameLabel')} <Required /></label>
                         <input
                             required
                             name="name"
                             value={form.name}
                             onChange={handleChange}
-                            placeholder="e.g. Website Redesign"
+                            placeholder={t('projects.namePlaceholder')}
                             className={inputClass}
                         />
                     </div>
 
                     {/* Description */}
                     <div className="flex flex-col gap-1.5">
-                        <label className={labelClass}>Description</label>
+                        <label className={labelClass}>{t('projects.description')}</label>
                         <textarea
                             name="description"
                             value={form.description}
                             onChange={handleChange}
-                            placeholder="Brief description of the project..."
+                            placeholder={t('projects.descriptionPlaceholder')}
                             rows={3}
                             className={`${inputClass} resize-none`}
                         />
@@ -193,11 +195,11 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <label className={labelClass}>Start Date</label>
+                            <label className={labelClass}>{t('projects.startDate')}</label>
                             <input type="date" name="startDate" value={form.startDate} onChange={handleChange} className={inputClass} />
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <label className={labelClass}>End Date</label>
+                            <label className={labelClass}>{t('projects.endDate')}</label>
                             <input type="date" name="endDate" value={form.endDate} onChange={handleChange} className={inputClass} />
                         </div>
                     </div>
@@ -205,17 +207,20 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                     {/* Status + Owner */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <label className={labelClass}>Status <Required /></label>
+                            <label className={labelClass}>{t('projects.status')} <Required /></label>
                             <select required name="status" value={form.status} onChange={handleChange} className={inputClass}>
-                                {PROJECT_STATUSES.map((s) => (
-                                    <option key={s} value={s}>{s.charAt(0) + s.slice(1).toLowerCase()}</option>
-                                ))}
+                                {PROJECT_STATUSES.map((s) => {
+                                    const statusKey = `projects.status${s.charAt(0) + s.slice(1).toLowerCase()}`
+                                    return (
+                                        <option key={s} value={s}>{t(statusKey)}</option>
+                                    )
+                                })}
                             </select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <label className={labelClass}>Project Owner <Required /></label>
+                            <label className={labelClass}>{t('projects.projectOwner')} <Required /></label>
                             <select required name="ownerId" value={form.ownerId} onChange={handleChange} className={inputClass}>
-                                <option value="">Select owner…</option>
+                                <option value="">{t('projects.selectOwner')}</option>
                                 {employees.map((e) => (
                                     <option key={e.id} value={e.id}>{e.name} {e.lastName}</option>
                                 ))}
@@ -228,13 +233,13 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                         className="flex flex-col gap-3 rounded-xl border border-[#E5E7EB] p-4"
                         style={{ backgroundColor: '#F8FAFC' }}
                     >
-                        <label className={labelClass}>Payment Type <Required /></label>
+                        <label className={labelClass}>{t('projects.paymentType')} <Required /></label>
 
                         {/* Radio cards */}
                         <div className="flex gap-3">
                             {([
-                                { value: 'HOURLY', label: 'Hourly' },
-                                { value: 'FIXED', label: 'Fixed Price' },
+                                { value: 'HOURLY', label: t('projects.hourlyOption') },
+                                { value: 'FIXED', label: t('projects.fixedPriceOption') },
                             ] as const).map(({ value, label }) => {
                                 const active = form.paymentType === value
                                 return (
@@ -273,8 +278,8 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                         <div className="flex flex-col gap-1.5">
                             <label className={labelClass}>
                                 {form.paymentType === 'HOURLY'
-                                    ? 'Hourly Rate (€)'
-                                    : 'Fixed Project Price (€)'}
+                                    ? t('projects.hourlyRate')
+                                    : t('projects.fixedProjectPrice')}
                             </label>
                             <input
                                 type="number"
@@ -283,7 +288,7 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                                 name="totalProjectPrice"
                                 value={form.totalProjectPrice}
                                 onChange={handleChange}
-                                placeholder={form.paymentType === 'HOURLY' ? 'e.g. 50' : 'e.g. 50 000'}
+                                placeholder={form.paymentType === 'HOURLY' ? t('projects.hourlyRatePlaceholder') : t('projects.fixedProjectPricePlaceholder')}
                                 className={inputClass}
                             />
                         </div>
@@ -294,13 +299,13 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                         className="flex flex-col gap-3 rounded-xl border border-[#E5E7EB] p-4"
                         style={{ backgroundColor: '#F8FAFC' }}
                     >
-                        <label className={labelClass}>Cost Type <Required /></label>
+                        <label className={labelClass}>{t('projects.fixedCostType')} <Required /></label>
 
                         {/* Radio cards */}
                         <div className="flex gap-3">
                             {([
-                                { value: 'TOTAL', label: 'Total Fixed Cost', hint: 'One-time cost' },
-                                { value: 'MONTHLY', label: 'Fixed Monthly Cost', hint: 'Per-month cost' },
+                                { value: 'TOTAL', label: t('projects.totalFixedCostOption'), hint: t('projects.onTimeCost') },
+                                { value: 'MONTHLY', label: t('projects.monthlyFixedCostOption'), hint: t('projects.perMonthCost') },
                             ] as const).map(({ value, label, hint }) => {
                                 const active = form.fixedCostType === value
                                 return (
@@ -352,8 +357,8 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                             <div className="flex flex-col gap-1.5">
                                 <label className={labelClass}>
                                     {form.fixedCostType === 'TOTAL'
-                                        ? 'Total Fixed Cost Amount (€)'
-                                        : 'Monthly Fixed Cost Amount (€)'}
+                                        ? t('projects.totalFixedCostAmount')
+                                        : t('projects.monthlyFixedCostAmount')}
                                     {' '}<Required />
                                 </label>
                                 <input
@@ -365,8 +370,8 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                                     onChange={handleChange}
                                     placeholder={
                                         form.fixedCostType === 'TOTAL'
-                                            ? 'e.g. 10 000'
-                                            : 'e.g. 1 000'
+                                            ? t('projects.totalFixedCostPlaceholder')
+                                            : t('projects.monthlyFixedCostPlaceholder')
                                     }
                                     className={inputClass}
                                     required // Always required if the type is set
@@ -383,7 +388,7 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                             className="px-5 py-2.5 rounded-xl text-sm font-bold text-[#6A7282] bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors border border-[#E5E7EB]"
                             style={{ fontFamily: 'Arial, sans-serif' }}
                         >
-                            Cancel
+                            {t('projects.cancel')}
                         </button>
                         <button
                             type="submit"
@@ -401,7 +406,7 @@ export default function NewProjectModal({ isOpen, onClose, onCreated }: NewProje
                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                                 </svg>
                             )}
-                            Create Project
+                            {t('projects.createProject')}
                         </button>
                     </div>
                 </form>

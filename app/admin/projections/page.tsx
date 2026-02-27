@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useLanguage } from '@/app/i18n'
 
 interface MonthProjection {
     month: string
@@ -24,6 +25,7 @@ interface ChartProps {
 }
 
 function ProjectionsChart({ data }: ChartProps) {
+    const { t } = useLanguage()
     const CHART_W = 1100
     const CHART_H = 300
     const PADDING_LEFT = 70
@@ -173,7 +175,7 @@ function ProjectionsChart({ data }: ChartProps) {
                         style={{ backgroundColor: '#EF4444' }}
                     />
                     <span className="text-sm" style={{ color: '#EF4444', fontFamily: 'Arial, sans-serif' }}>
-                        Cost
+                        {t('projections.cost')}
                     </span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -182,7 +184,7 @@ function ProjectionsChart({ data }: ChartProps) {
                         style={{ backgroundColor: '#10B981' }}
                     />
                     <span className="text-sm" style={{ color: '#10B981', fontFamily: 'Arial, sans-serif' }}>
-                        Margin
+                        {t('projections.margin')}
                     </span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -191,7 +193,7 @@ function ProjectionsChart({ data }: ChartProps) {
                         style={{ backgroundColor: '#4F39F6' }}
                     />
                     <span className="text-sm" style={{ color: '#4F39F6', fontFamily: 'Arial, sans-serif' }}>
-                        Revenue
+                        {t('projections.revenue')}
                     </span>
                 </div>
             </div>
@@ -205,7 +207,8 @@ interface TableProps {
 }
 
 function ProjectionsTable({ data }: TableProps) {
-    const headers = ['Month', 'Revenue', 'Cost', 'Margin']
+    const { t } = useLanguage()
+    const headers = [t('projections.month'), t('projections.revenue'), t('projections.cost'), t('projections.margin')]
 
     return (
         <div
@@ -318,6 +321,7 @@ function ProjectionsTable({ data }: TableProps) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ProjectionsPage() {
+    const { t } = useLanguage()
     const [data, setData] = useState<MonthProjection[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -349,7 +353,7 @@ export default function ProjectionsPage() {
                         fontFamily: 'Arial, sans-serif',
                     }}
                 >
-                    Financial Projections
+                    {t('projections.title')}
                 </h1>
 
                 {/* Error */}
@@ -385,7 +389,7 @@ export default function ProjectionsPage() {
                                 fontFamily: 'Arial, sans-serif',
                             }}
                         >
-                            Financial Projections (Next 12 Months)
+                            {t('projections.title')} (Next 12 Months)
                         </p>
                     </div>
 

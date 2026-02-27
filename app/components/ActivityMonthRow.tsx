@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import clsx from 'clsx'
 import { Calendar, ChevronDown, Trash2, CheckCircle2, Palmtree } from 'lucide-react'
 import { usePortalData, type TimeLogWithProject } from '../portal/PortalDataProvider'
+import { useLanguage } from '../i18n'
 
 interface ActivityMonthRowProps {
     month: string           // e.g. "APRIL 2026"
@@ -25,6 +26,7 @@ export default function ActivityMonthRow({
     const [expanded, setExpanded] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const { deleteLog, refreshData } = usePortalData()
+    const { t } = useLanguage()
 
     const handleDelete = async (log: TimeLogWithProject) => {
         if (deletingId) return
@@ -91,7 +93,7 @@ export default function ActivityMonthRow({
                                 className="text-[10px] font-bold uppercase text-[#90A1B9] leading-[13px] tracking-[1px]"
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
-                                HRS
+                                {t('employeeDashboard.hrs')}
                             </span>
                         </div>
                         {/* Work / Vacation breakdown */}
@@ -100,13 +102,13 @@ export default function ActivityMonthRow({
                                 className="text-[9px] font-bold text-[#2B7FFF] uppercase leading-3 tracking-[-0.3px]"
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
-                                {workHours}H WORK
+                                {workHours}H {t('employeeDashboard.logWorKHoursInShort').toUpperCase()}
                             </span>
                             <span
                                 className="text-[9px] font-bold text-[#FF6900] uppercase leading-3 tracking-[-0.3px]"
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
-                                {vacationHours}H VACATION
+                                {vacationHours}H {t('employeeDashboard.vacation').toUpperCase()}
                             </span>
                         </div>
                     </div>
@@ -123,7 +125,7 @@ export default function ActivityMonthRow({
             {expanded && (
                 <div className="ml-2 border-l border-[#F1F5F9] animate-in slide-in-from-top-2 fade-in duration-200">
                     {sortedLogs.length === 0 ? (
-                        <div className="px-6 py-4 text-sm text-[#90A1B9]">No entries for this month.</div>
+                        <div className="px-6 py-4 text-sm text-[#90A1B9]">{t('employeeDashboard.noActivity')}</div>
                     ) : (
                         sortedLogs.map((log) => {
                             const isVacation = log.type === 'VACATION'
@@ -164,7 +166,7 @@ export default function ActivityMonthRow({
                                                 )}
                                                 style={{ fontFamily: 'Arial, sans-serif' }}
                                             >
-                                                {isVacation ? 'Vacation' : (log.project?.name ?? 'Unknown Project')}
+                                                {isVacation ? t('employeeDashboard.vacation') : (log.project?.name ?? 'Unknown Project')}
                                             </span>
                                             <div className="flex items-center gap-1">
                                                 <Calendar className="size-[10px] text-[#90A1B9] shrink-0" />
@@ -185,7 +187,7 @@ export default function ActivityMonthRow({
                                                 className="text-[11px] font-bold text-[#FF6900] uppercase tracking-[-0.3px]"
                                                 style={{ fontFamily: 'Arial, sans-serif' }}
                                             >
-                                                -{log.hours / 8} Day{log.hours / 8 !== 1 ? 's' : ''}
+                                                -{log.hours / 8} {log.hours / 8 !== 1 ? t('employeeDashboard.days') : t('employeeDashboard.days').replace(/s$/i, '')}
                                             </span>
                                         ) : (
                                             <div className="flex items-baseline gap-0.5">
@@ -199,7 +201,7 @@ export default function ActivityMonthRow({
                                                     className="text-[10px] font-bold text-[#90A1B9] uppercase leading-4 tracking-[1px]"
                                                     style={{ fontFamily: 'Arial, sans-serif' }}
                                                 >
-                                                    HRS
+                                                    {t('employeeDashboard.hrs')}
                                                 </span>
                                             </div>
                                         )}

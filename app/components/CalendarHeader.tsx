@@ -1,11 +1,6 @@
 import React from 'react'
-
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-
-const MONTH_NAMES = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-]
+import { useLanguage } from '../i18n'
 
 interface CalendarHeaderProps {
     month: number   // 0-indexed
@@ -16,6 +11,12 @@ interface CalendarHeaderProps {
 }
 
 export default function CalendarHeader({ month, year, onPrev, onToday, onNext }: CalendarHeaderProps) {
+    const { t, language } = useLanguage()
+
+    // Using UTC to avoid timezone drift edge-cases when formatting just a month/year
+    const date = new Date(Date.UTC(year, month, 1))
+    const monthName = date.toLocaleString(language === 'it' ? 'it-IT' : 'en-US', { month: 'long', timeZone: 'UTC' })
+
     return (
         <div className="flex items-center justify-between px-6 py-[24px] border-b border-[#F1F5F9]">
             {/* Month + Year */}
@@ -23,7 +24,7 @@ export default function CalendarHeader({ month, year, onPrev, onToday, onNext }:
                 className="text-[20px] font-bold uppercase tracking-[-0.5px] text-[#1D293D] leading-7"
                 style={{ fontFamily: 'Arial, sans-serif' }}
             >
-                {MONTH_NAMES[month]} {year}
+                {monthName} {year}
             </span>
 
             {/* Navigation */}
@@ -43,7 +44,7 @@ export default function CalendarHeader({ month, year, onPrev, onToday, onNext }:
                     className="px-4 py-[9.75px] rounded-xl text-[12px] font-bold text-[#155DFC] hover:bg-blue-50 transition-colors leading-4"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Today
+                    {t('common.today')}
                 </button>
 
                 <button

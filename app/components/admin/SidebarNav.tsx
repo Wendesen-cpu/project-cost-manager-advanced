@@ -3,32 +3,34 @@
 import { usePathname } from 'next/navigation'
 import SidebarNavLink from './SidebarNavLink'
 import { LayoutDashboard, Users, Briefcase, Target, Link as LinkIcon } from 'lucide-react'
+import { useLanguage } from '../../i18n'
 
 const NAV_ITEMS = [
     {
         href: '/admin',
-        label: 'Dashboard',
+        labelKey: 'nav.dashboard',
         icon: <LayoutDashboard className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/employees',
-        label: 'Employees',
+        labelKey: 'nav.employees',
         icon: <Users className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/projects',
-        label: 'Projects',
+        labelKey: 'nav.projects',
         icon: <Briefcase className="size-full" strokeWidth={2} />,
     },
     {
         href: '/admin/projections',
-        label: 'Projections',
+        labelKey: 'nav.projections',
         icon: <Target className="size-full" strokeWidth={2} />,
     },
 ]
 
 export default function SidebarNav() {
     const pathname = usePathname()
+    const { t } = useLanguage()
 
     return (
         <nav
@@ -46,7 +48,7 @@ export default function SidebarNav() {
                     <SidebarNavLink
                         key={item.href}
                         href={item.href}
-                        label={item.label}
+                        label={t(item.labelKey)}
                         icon={item.icon}
                         isActive={isActive}
                     />
