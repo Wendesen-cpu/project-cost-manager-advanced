@@ -1,17 +1,21 @@
-'use client'
+"use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import type { TimeLog } from '../../lib/generated/prisma'
 
 interface User {
-    id: string
-    name: string
-    remainingVacationDays: number | null
+  id: string;
+  name: string;
+  remainingVacationDays: number | null;
 }
 
 interface Project {
-    id: string
-    name: string
+  id: string;
+  name: string;
+}
+
+export interface TimeLogWithProject extends TimeLog {
+  project?: Project;
 }
 
 interface PortalData {
@@ -83,26 +87,107 @@ export function PortalDataProvider({ children }: { children: React.ReactNode }) 
         setTimeLogs(prevLogs => prevLogs.filter(log => log.id !== logId))
     }
 
-    const updateUser = (updatedUser: User) => {
-        console.log('👤 PortalDataProvider: Updating user locally', updatedUser)
-        setUser(updatedUser)
+const PortalDataContext = createContext<PortalData | undefined>(undefined);
+
+export function PortalDataProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [user, setUser] = useState<User | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [timeLogs, setTimeLogs] = useState<TimeLog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refreshData = async () => {
+    setLoading(true);
+    try {
+      console.log("🔄 PortalDataProvider: Starting refresh...");
+
+      // Fetch mock user
+      const userRes = await fetch("/api/me");
+      if (!userRes.ok) throw new Error("Failed to fetch user");
+      const userData = await userRes.json();
+      console.log("👤 PortalDataProvider: User fetched", userData);
+
+      // Fetch user's projects & time logs in parallel
+      const [projRes, logsRes] = await Promise.all([
+        fetch(`/api/employee/projects?userId=${userData.id}`),
+        fetch(`/api/employee/time-logs?userId=${userData.id}`),
+      ]);
+
+      if (!projRes.ok) throw new Error("Failed to fetch projects");
+      if (!logsRes.ok) throw new Error("Failed to fetch time logs");
+
+      const projData = await projRes.json();
+      const logsData = await logsRes.json();
+
+      console.log(
+        "📊 PortalDataProvider: Projects fetched",
+        projData.length,
+        "projects",
+      );
+      console.log(
+        "📋 PortalDataProvider: Logs fetched",
+        logsData.length,
+        "logs",
+      );
+
+      // Update all state synchronously after all data is fetched
+      setUser(userData);
+      setProjects(projData);
+      setTimeLogs(logsData);
+
+      console.log("✅ PortalDataProvider: All state updated");
+    } catch (error) {
+      console.error("❌ PortalDataProvider: Error fetching data:", error);
+      // Don't reset state on error - keep the last known good state
+    } finally {
+      setLoading(false);
     }
+  };
 
-    useEffect(() => {
-        refreshData()
-    }, [])
+  const addLog = (log: TimeLog) => {
+    console.log("➕ PortalDataProvider: Adding log locally", log);
+    setTimeLogs((prevLogs) => [log, ...prevLogs]);
+  };
 
-    return (
-        <PortalDataContext.Provider value={{ user, projects, timeLogs, loading, refreshData, addLog, deleteLog, updateUser }}>
-            {children}
-        </PortalDataContext.Provider>
-    )
+  const deleteLog = (logId: string) => {
+    console.log("❌ PortalDataProvider: Removing log locally", logId);
+    setTimeLogs((prevLogs) => prevLogs.filter((log) => log.id !== logId));
+  };
+
+  const updateUser = (updatedUser: User) => {
+    console.log("👤 PortalDataProvider: Updating user locally", updatedUser);
+    setUser(updatedUser);
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  return (
+    <PortalDataContext.Provider
+      value={{
+        user,
+        projects,
+        timeLogs,
+        loading,
+        refreshData,
+        addLog,
+        deleteLog,
+        updateUser,
+      }}
+    >
+      {children}
+    </PortalDataContext.Provider>
+  );
 }
 
 export function usePortalData() {
-    const context = useContext(PortalDataContext)
-    if (context === undefined) {
-        throw new Error('usePortalData must be used within a PortalDataProvider')
-    }
-    return context
+  const context = useContext(PortalDataContext);
+  if (context === undefined) {
+    throw new Error("usePortalData must be used within a PortalDataProvider");
+  }
+  return context;
 }
