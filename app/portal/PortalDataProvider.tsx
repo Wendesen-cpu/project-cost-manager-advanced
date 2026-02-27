@@ -14,6 +14,10 @@ interface Project {
   name: string;
 }
 
+export interface TimeLogWithProject extends TimeLog {
+  project?: Project;
+}
+
 interface PortalData {
     user: User | null
     projects: Project[]
