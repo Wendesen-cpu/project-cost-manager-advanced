@@ -1,11 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-
-type Language = 'EN' | 'IT'
+import { useLanguage } from '../../i18n'
 
 export default function SidebarLanguageSwitcher() {
-    const [active, setActive] = useState<Language>('EN')
+    const { language, setLanguage } = useLanguage()
 
     return (
         <div
@@ -16,12 +14,12 @@ export default function SidebarLanguageSwitcher() {
             }}
             data-component="SidebarLanguageSwitcher"
         >
-            {(['EN', 'IT'] as Language[]).map((lang) => {
-                const isSelected = active === lang
+            {(['en', 'it'] as const).map((lang) => {
+                const isSelected = language === lang
                 return (
                     <button
                         key={lang}
-                        onClick={() => setActive(lang)}
+                        onClick={() => setLanguage(lang)}
                         className="relative flex-1 flex items-center justify-center py-1.5 rounded-xl transition-colors"
                         style={
                             isSelected
@@ -43,7 +41,7 @@ export default function SidebarLanguageSwitcher() {
                                 }`}
                             style={{ fontFamily: 'Arial, sans-serif' }}
                         >
-                            {lang}
+                            {lang.toUpperCase()}
                         </span>
                     </button>
                 )

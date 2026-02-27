@@ -1,12 +1,15 @@
 'use client'
 
 import { LogOut } from 'lucide-react'
+import { useLanguage } from '../i18n'
 
 interface TopNavProps {
     onLogout?: () => void
 }
 
 export default function TopNav({ onLogout }: TopNavProps) {
+    const { language, setLanguage, t } = useLanguage()
+
     return (
         <div className="w-full bg-white shadow-sm">
             <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -32,17 +35,29 @@ export default function TopNav({ onLogout }: TopNavProps) {
                 <div className="flex items-center gap-6">
                     {/* Language Switcher */}
                     <div className="flex items-center rounded-lg bg-[#F1F5F9] p-1">
-                        <button className="flex items-center justify-center rounded-md bg-white px-3 py-1 shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]">
+                        <button
+                            onClick={() => setLanguage('en')}
+                            className={`flex items-center justify-center rounded-md px-3 py-1 transition-colors ${language === 'en'
+                                    ? 'bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]'
+                                    : 'hover:bg-white/50'
+                                }`}
+                        >
                             <span
-                                className="text-xs font-bold text-[#155DFC] leading-4"
+                                className={`text-xs font-bold leading-4 ${language === 'en' ? 'text-[#155DFC]' : 'text-[#62748E]'}`}
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
                                 EN
                             </span>
                         </button>
-                        <button className="flex items-center justify-center rounded-md px-3 py-1 hover:bg-white/50 transition-colors">
+                        <button
+                            onClick={() => setLanguage('it')}
+                            className={`flex items-center justify-center rounded-md px-3 py-1 transition-colors ${language === 'it'
+                                    ? 'bg-white shadow-[0px_1px_3px_0px_rgba(0,0,0,0.1),0px_1px_2px_-1px_rgba(0,0,0,0.1)]'
+                                    : 'hover:bg-white/50'
+                                }`}
+                        >
                             <span
-                                className="text-xs font-bold text-[#62748E] leading-4"
+                                className={`text-xs font-bold leading-4 ${language === 'it' ? 'text-[#155DFC]' : 'text-[#62748E]'}`}
                                 style={{ fontFamily: 'Arial, sans-serif' }}
                             >
                                 IT
@@ -60,7 +75,7 @@ export default function TopNav({ onLogout }: TopNavProps) {
                             className="text-sm text-[#62748E] leading-5"
                             style={{ fontFamily: 'Arial, sans-serif' }}
                         >
-                            Logout
+                            {t('nav.logout')}
                         </span>
                     </button>
                 </div>

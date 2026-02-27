@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Shield, UserPlus, UserCircle, X, Check, Loader2 } from 'lucide-react'
+import { useLanguage } from '@/app/i18n'
 
 interface EmployeeModalProps {
     isOpen: boolean
@@ -11,6 +12,7 @@ interface EmployeeModalProps {
 }
 
 export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }: EmployeeModalProps) {
+    const { t } = useLanguage()
     const isEdit = !!employeeId
     const [loading, setLoading] = useState(false)
     const [fetching, setFetching] = useState(false)
@@ -116,8 +118,8 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
     if (!isOpen) return null
 
     const isSystemAdmin = requesterRole === 'SYSTEM_ADMIN'
-    const modalTitle = isEdit ? 'Edit User' : 'New User'
-    const modalSubtitle = isEdit ? 'Update account details' : 'Add a new member to the team'
+    const modalTitle = isEdit ? t('employees.editUser') : t('employees.newUser')
+    const modalSubtitle = isEdit ? t('employees.updateAccountDetails') : t('employees.addNewMember')
     const Icon = isEdit ? <UserCircle className="text-white size-5" /> : <UserPlus className="text-white size-5" />
 
     return (
@@ -152,7 +154,7 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
                     {fetching ? (
                         <div className="flex flex-col items-center justify-center p-20 gap-4">
                             <Loader2 className="animate-spin text-[#0F172B] size-8 opacity-20" />
-                            <p className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest">Loading Details...</p>
+                            <p className="text-xs font-bold text-[#94A3B8] uppercase tracking-widest">{t('employees.loadingDetails')}</p>
                         </div>
                     ) : (
                         <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -164,31 +166,31 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className={labelClass}>First Name <Required /></label>
-                                    <input required name="name" value={form.name} onChange={handleChange} placeholder="John" className={inputClass} />
+                                    <label className={labelClass}>{t('employees.firstName')} <Required /></label>
+                                    <input required name="name" value={form.name} onChange={handleChange} placeholder={t('employees.firstNamePlaceholder')} className={inputClass} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className={labelClass}>Last Name <Required /></label>
-                                    <input required name="lastName" value={form.lastName} onChange={handleChange} placeholder="Doe" className={inputClass} />
+                                    <label className={labelClass}>{t('employees.lastName')} <Required /></label>
+                                    <input required name="lastName" value={form.lastName} onChange={handleChange} placeholder={t('employees.lastNamePlaceholder')} className={inputClass} />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className={labelClass}>Email Address <Required /></label>
-                                <input required type="email" name="email" value={form.email} onChange={handleChange} placeholder="name@company.com" className={inputClass} />
+                                <label className={labelClass}>{t('employees.emailAddress')} <Required /></label>
+                                <input required type="email" name="email" value={form.email} onChange={handleChange} placeholder={t('employees.emailPlaceholder')} className={inputClass} />
                             </div>
 
                             {!isEdit && (
                                 <div className="space-y-2">
-                                    <label className={labelClass}>Password <Required /></label>
-                                    <input required type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••" className={inputClass} />
+                                    <label className={labelClass}>{t('employees.password')} <Required /></label>
+                                    <input required type="password" name="password" value={form.password} onChange={handleChange} placeholder={t('employees.passwordPlaceholder')} className={inputClass} />
                                 </div>
                             )}
 
                             <div className="p-6 bg-[#F8FAFC] rounded-[24px] border border-[#F1F5F9] space-y-6">
                                 {isSystemAdmin && (
                                     <div className="space-y-2">
-                                        <label className={labelClass}>System Role <Required /></label>
+                                        <label className={labelClass}>{t('employees.systemRole')} <Required /></label>
                                         <div className="relative">
                                             <Shield className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-[#94A3B8]" />
                                             <select
@@ -198,8 +200,8 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
                                                 onChange={handleChange}
                                                 className={`${inputClass} pl-11 bg-white`}
                                             >
-                                                <option value="EMPLOYEE">EMPLOYEE</option>
-                                                <option value="ADMIN">ADMIN</option>
+                                                <option value="EMPLOYEE">{t('employees.roleEmployee')}</option>
+                                                <option value="ADMIN">{t('employees.roleAdmin')}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -207,12 +209,12 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className={labelClass}>Monthly Cost (€) <Required /></label>
-                                        <input required type="number" min="0" step="0.01" name="monthlyCost" value={form.monthlyCost} onChange={handleChange} placeholder="0.00" className={`${inputClass} bg-white`} />
+                                        <label className={labelClass}>{t('employees.monthlyCost')} <Required /></label>
+                                        <input required type="number" min="0" step="0.01" name="monthlyCost" value={form.monthlyCost} onChange={handleChange} placeholder={t('employees.monthlyCostPlaceholder')} className={`${inputClass} bg-white`} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className={labelClass}>Vacation Days <Required /></label>
-                                        <input required type="number" min="0" name="remainingVacationDays" value={form.remainingVacationDays} onChange={handleChange} placeholder="0" className={`${inputClass} bg-white`} />
+                                        <label className={labelClass}>{t('employees.vacationDaysLabel')} <Required /></label>
+                                        <input required type="number" min="0" name="remainingVacationDays" value={form.remainingVacationDays} onChange={handleChange} placeholder={t('employees.vacationDaysPlaceholder')} className={`${inputClass} bg-white`} />
                                     </div>
                                 </div>
                             </div>
@@ -220,7 +222,7 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
                             {/* Actions */}
                             <div className="flex items-center justify-end gap-3 pt-4">
                                 <button type="button" onClick={onClose} className="px-6 py-3 rounded-2xl text-sm font-bold text-[#64748B] hover:bg-[#F1F5F9] transition-all">
-                                    Cancel
+                                    {t('employees.cancel')}
                                 </button>
                                 <button
                                     type="submit"
@@ -228,7 +230,7 @@ export default function EmployeeModal({ isOpen, employeeId, onClose, onSuccess }
                                     className="px-8 py-3 rounded-2xl bg-[#0F172B] text-white text-sm font-bold shadow-lg shadow-slate-200 hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center gap-2"
                                 >
                                     {loading ? <Loader2 className="animate-spin size-4" /> : <Check className="size-4" />}
-                                    {isEdit ? 'Save Changes' : 'Create User'}
+                                    {isEdit ? t('employees.saveChanges') : t('employees.createUser')}
                                 </button>
                             </div>
                         </form>

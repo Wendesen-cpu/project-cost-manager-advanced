@@ -6,6 +6,7 @@ import DashboardQuickActions from '@/app/components/admin/DashboardQuickActions'
 import NewProjectModal from '@/app/components/admin/NewProjectModal'
 import EmployeeModal from '@/app/components/admin/EmployeeModal'
 import { Briefcase, Users, Wallet } from 'lucide-react'
+import { useLanguage } from '@/app/i18n'
 
 interface DashboardStats {
     activeProjectCount: number
@@ -23,6 +24,7 @@ export default function AdminDashboardPage() {
     const [statsError, setStatsError] = useState<string | null>(null)
     const [isNewProjectOpen, setIsNewProjectOpen] = useState(false)
     const [isNewEmployeeOpen, setIsNewEmployeeOpen] = useState(false)
+    const { t } = useLanguage()
 
     const fetchStats = useCallback(async () => {
         setStatsLoading(true)
@@ -59,7 +61,7 @@ export default function AdminDashboardPage() {
                     className="text-[#0F172B] font-bold text-[30px] leading-9 tracking-[-0.75px]"
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 >
-                    Dashboard
+                    {t('dashboard.title')}
                 </h1>
 
                 {/* Stat cards row */}
@@ -75,19 +77,19 @@ export default function AdminDashboardPage() {
                         <DashboardStatCard
                             icon={<Briefcase strokeWidth={2} />}
                             iconBg="#EFF6FF"
-                            label="Active Projects"
+                            label={t('dashboard.activeProjects')}
                             value={statsLoading ? '—' : stats?.activeProjectCount ?? 0}
                         />
                         <DashboardStatCard
                             icon={<Users strokeWidth={2} />}
                             iconBg="#F1F5F9"
-                            label="Total Employees"
+                            label={t('dashboard.totalEmployees')}
                             value={statsLoading ? '—' : stats?.totalEmployeeCount ?? 0}
                         />
                         <DashboardStatCard
                             icon={<Wallet strokeWidth={2} />}
                             iconBg="#EFF6FF"
-                            label="Est. Monthly Revenue"
+                            label={t('dashboard.monthlyRevenueEst')}
                             value={
                                 statsLoading
                                     ? '—'

@@ -1,6 +1,9 @@
+'use client'
+
 import Link from 'next/link'
 import { Calendar, Briefcase, Users } from 'lucide-react'
 import { ProjectStatus, PaymentType } from '@lib/generated/prisma/enums'
+import { useLanguage } from '@/app/i18n'
 
 interface ProjectCardProps {
     id: string
@@ -33,6 +36,7 @@ export default function ProjectCard({
     memberCount,
     totalValue,
 }: ProjectCardProps) {
+    const { t } = useLanguage()
     const isArchived = status === ProjectStatus.ARCHIVED
 
     return (
@@ -55,7 +59,7 @@ export default function ProjectCard({
             {/* Description */}
             <div className="mb-[24px] w-full">
                 <p className="text-[#6a7282] text-[14px] leading-[22.75px] line-clamp-2">
-                    {description || 'No description provided.'}
+                    {description || t('projects.noDescriptionProvided')}
                 </p>
             </div>
 
@@ -66,7 +70,7 @@ export default function ProjectCard({
                     <div className="flex items-center gap-[6px]">
                         <Calendar className="w-[14px] h-[14px] text-[#6a7282]" strokeWidth={2} />
                         <span className="text-[#6a7282] text-[12px] font-bold uppercase tracking-[-0.6px]">
-                            Start
+                            {t('projects.start')}
                         </span>
                     </div>
                     <span className="text-[#0f172b] text-[12px] font-bold">
@@ -79,7 +83,7 @@ export default function ProjectCard({
                     <div className="flex items-center gap-[6px]">
                         <Briefcase className="w-[14px] h-[14px] text-[#6a7282]" strokeWidth={2} />
                         <span className="text-[#6a7282] text-[12px] font-bold uppercase tracking-[-0.6px]">
-                            Type
+                            {t('projects.type')}
                         </span>
                     </div>
                     <span className="text-[#0f172b] text-[12px] font-bold">
@@ -92,7 +96,7 @@ export default function ProjectCard({
                     <div className="flex items-center gap-[6px]">
                         <Users className="w-[14px] h-[14px] text-[#6a7282]" strokeWidth={2} />
                         <span className="text-[#6a7282] text-[12px] font-bold uppercase tracking-[-0.6px]">
-                            Members
+                            {t('projects.members')}
                         </span>
                     </div>
                     <span className="text-[#0f172b] text-[12px] font-bold">
@@ -107,7 +111,7 @@ export default function ProjectCard({
                     href={`/admin/projects/${id}`}
                     className="text-[#155dfc] text-[12px] font-bold uppercase tracking-[1.2px] hover:text-blue-800 transition-colors"
                 >
-                    View Details
+                    {t('projects.viewDetails')}
                 </Link>
                 <span className="text-[#0f172b] text-[14px] font-bold">
                     {totalValue ? formatCurrency(totalValue) : '€0'}

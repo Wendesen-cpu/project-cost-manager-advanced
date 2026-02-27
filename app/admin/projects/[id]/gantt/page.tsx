@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Info } from 'lucide-react'
 import { ProjectStatus, PaymentType } from '@lib/generated/prisma/enums'
+import { useLanguage } from '@/app/i18n'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AssignedUser {
@@ -117,6 +118,7 @@ function GanttBar({ label, color, leftPct, widthPct, tooltip }: BarProps) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function GanttPage() {
+    const { t } = useLanguage()
     const { id } = useParams<{ id: string }>()
     const router = useRouter()
 
@@ -133,11 +135,11 @@ export default function GanttPage() {
             const data: Project = await res.json()
             setProject(data)
         } catch {
-            setError('Could not load project.')
+            setError(t('projects.couldNotLoadProject'))
         } finally {
             setLoading(false)
         }
-    }, [id])
+    }, [id, t])
 
     useEffect(() => { fetchProject() }, [fetchProject])
 
@@ -152,7 +154,7 @@ export default function GanttPage() {
     if (error || !project) {
         return (
             <div className="w-full min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F8FAFC' }}>
-                <p className="text-[#B91C1C]">{error ?? 'Project not found'}</p>
+                <p className="text-[#B91C1C]">{error ?? t('projects.projectNotFound')}</p>
             </div>
         )
     }
@@ -199,14 +201,14 @@ export default function GanttPage() {
                 {/* ── Breadcrumb ── */}
                 <nav className="flex items-center gap-2 text-sm text-[#6A7282]">
                     <button onClick={() => router.push('/admin/projects')} className="hover:text-[#0F172B] transition-colors">
-                        Projects
+                        {t('nav.projects')}
                     </button>
                     <span>/</span>
                     <button onClick={() => router.push(`/admin/projects/${project.id}`)} className="hover:text-[#0F172B] transition-colors">
                         {project.name}
                     </button>
                     <span>/</span>
-                    <span className="text-[#0F172B] font-medium">Gantt Chart</span>
+                    <span className="text-[#0F172B] font-medium">{t('projects.ganttChart')}</span>
                 </nav>
 
                 {/* ── Header ── */}
@@ -222,7 +224,7 @@ export default function GanttPage() {
                         className="flex items-center gap-2 text-sm font-medium text-[#0F172B] border border-[#E2E8F0] rounded-md px-4 py-2 bg-white hover:bg-[#F8FAFC] transition-colors shrink-0"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Details
+                        {t('projects.backToDetails')}
                     </button>
                 </div>
 
@@ -231,14 +233,14 @@ export default function GanttPage() {
                     {/* Card header */}
                     <div className="px-6 pt-5 pb-3 border-b border-[#F1F5F9]">
                         <p className="text-sm font-bold text-[#0F172B] uppercase tracking-wide">
-                            Employee Assignment Timeline
+                            {t('projects.ganttTitle')}
                         </p>
                     </div>
 
                     {/* Date scale header */}
                     <div className="px-6 pt-4 flex items-center gap-4">
                         <div className="w-40 shrink-0 text-xs font-bold text-[#6A7282] uppercase tracking-[0.6px]">
-                            Member
+                            {t('projects.memberTableHeader')}
                         </div>
                         <div className="relative flex-1 flex justify-between">
                             <span className="text-xs text-[#6A7282]">{startLabel}</span>
@@ -250,7 +252,7 @@ export default function GanttPage() {
                     <div className="px-6 pb-2 divide-y divide-[#F1F5F9]">
                         {memberRanges.length === 0 ? (
                             <p className="py-8 text-center text-sm text-[#6A7282] italic">
-                                No team members assigned yet.
+                                {t('projects.noTeamMembersAssigned')}
                             </p>
                         ) : (
                             memberRanges.map(({ assignment, color, leftPct, widthPct, startDate, endDate }) => (
@@ -269,14 +271,14 @@ export default function GanttPage() {
                     {/* Footer scale */}
                     <div className="px-6 py-3 border-t border-[#F1F5F9] flex items-center">
                         <div className="w-40 shrink-0 text-xs text-[#6A7282] uppercase tracking-[0.4px]">
-                            Start: {startLabel}
+                            {t('projects.startLabel').replace('{label}', startLabel)}
                         </div>
                         <div className="flex-1 flex justify-center items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#4F39F6]" />
-                            <span className="text-xs text-[#6A7282] uppercase tracking-[0.6px]">Timeline View</span>
+                            <span className="text-xs text-[#6A7282] uppercase tracking-[0.6px]">{t('projects.timelineView')}</span>
                         </div>
                         <div className="text-xs text-[#6A7282] uppercase tracking-[0.4px]">
-                            End: {endLabel}
+                            {t('projects.endLabel').replace('{label}', endLabel)}
                         </div>
                     </div>
                 </div>
@@ -285,11 +287,9 @@ export default function GanttPage() {
                 <div className="rounded-lg border border-[#C7D7FF] bg-[#EFF6FF] px-5 py-4 flex gap-3">
                     <Info className="w-4 h-4 text-[#4F39F6] shrink-0 mt-0.5" />
                     <div>
-                        <p className="text-xs font-bold text-[#4F39F6] uppercase tracking-wide mb-1">Gantt View Info</p>
+                        <p className="text-xs font-bold text-[#4F39F6] uppercase tracking-wide mb-1">{t('projects.ganttViewInfo')}</p>
                         <p className="text-xs text-[#4F39F6] leading-5">
-                            This chart visualizes when each team member is active on the project based on their logged work entries.
-                            Hover over a bar to see the exact active dates and daily hours commitment.
-                            The colors help distinguish between different employees at a glance.
+                            {t('projects.ganttViewDescription')}
                         </p>
                     </div>
                 </div>
