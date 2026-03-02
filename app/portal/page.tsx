@@ -5,6 +5,7 @@ import TopNav from '../components/TopNav'
 import EmployeeSidebar from '../components/EmployeeSidebar'
 import PortalMainContent from '../components/PortalMainContent'
 import { PortalDataProvider, usePortalData } from './PortalDataProvider'
+import { AIChat } from '../components/AIChat'
 
 export default function EmployeePortal() {
     const handleLogout = () => {
@@ -21,7 +22,7 @@ export default function EmployeePortal() {
 }
 
 function PortalContent({ onLogout }: { onLogout: () => void }) {
-    const { user, loading } = usePortalData()
+    const { user, loading, silentRefresh } = usePortalData()
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -43,6 +44,7 @@ function PortalContent({ onLogout }: { onLogout: () => void }) {
                     </div>
                 </div>
             </main>
+            <AIChat userId={user?.id || ''} onRefresh={silentRefresh} />
         </div>
     )
 }

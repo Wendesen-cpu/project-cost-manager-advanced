@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { Calendar, ChevronDown, Trash2, CheckCircle2, Palmtree } from 'lucide-react'
 import { usePortalData, type TimeLogWithProject } from '../portal/PortalDataProvider'
 import { useLanguage } from '../i18n'
+import { deleteTimeLog } from '../actions/timelogs'
 
 interface ActivityMonthRowProps {
     month: string           // e.g. "APRIL 2026"
@@ -32,8 +33,7 @@ export default function ActivityMonthRow({
         if (deletingId) return
         setDeletingId(log.id)
         try {
-            const res = await fetch(`/api/employee/time-logs/${log.id}`, { method: 'DELETE' })
-            if (!res.ok) throw new Error('Delete failed')
+            await deleteTimeLog(log.id)
             deleteLog(log.id)
             // If it's vacation, refresh to get updated remaining days
             if (log.type === 'VACATION') {

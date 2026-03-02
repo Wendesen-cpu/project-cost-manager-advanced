@@ -16,7 +16,6 @@ export default function MonthlyCalendar() {
     const [viewMonth, setViewMonth] = useState(today.getMonth())
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-
     // Group logs by YYYY-MM-DD for the CalendarGrid
     const groupedLogs = useMemo(() => {
         const groups: Record<string, (TimeLog & { project?: { name: string } })[]> = {}
@@ -24,7 +23,7 @@ export default function MonthlyCalendar() {
             // Extract YYYY-MM-DD date string consistently
             let dateStr: string
             const dateValue = log.date as unknown
-            
+
             if (typeof dateValue === 'string') {
                 // If already a string, extract date part (handles ISO format)
                 dateStr = (dateValue as string).split('T')[0]
@@ -37,7 +36,7 @@ export default function MonthlyCalendar() {
                 const isoString = new Date(dateValue as string | number).toISOString()
                 dateStr = isoString.split('T')[0]
             }
-            
+
             if (!groups[dateStr]) groups[dateStr] = []
             groups[dateStr].push(log as TimeLog & { project?: { name: string } })
         })

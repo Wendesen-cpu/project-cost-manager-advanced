@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import { Plus, X, Palmtree } from "lucide-react";
 import type { TimeLog } from "@/lib/generated/prisma";
+import { deleteTimeLog } from "../actions/timelogs";
+
 
 interface CalendarDayCellProps {
   day: number | null; // null = padding cell (outside month)
@@ -35,10 +37,7 @@ export default function CalendarDayCell({
 
     setDeletingId(logId);
     try {
-      const res = await fetch(`/api/employee/time-logs/${logId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete");
+      await deleteTimeLog(logId);
       onDeleteLog?.(logId);
     } catch (err) {
       console.error(err);
