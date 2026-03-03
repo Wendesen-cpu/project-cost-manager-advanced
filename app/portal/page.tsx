@@ -25,7 +25,7 @@ export default function EmployeePortal() {
 }
 
 function PortalContent({ onLogout }: { onLogout: () => void }) {
-    const { user, loading, silentRefresh } = usePortalData()
+    const { user, projects, loading, silentRefresh } = usePortalData()
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -47,7 +47,7 @@ function PortalContent({ onLogout }: { onLogout: () => void }) {
                     </div>
                 </div>
             </main>
-            <AIChat userId={user?.id || ''} onRefresh={silentRefresh} />
+            <AIChat userId={user?.id || ''} onRefresh={silentRefresh} projects={projects} />
         </div>
     )
 }

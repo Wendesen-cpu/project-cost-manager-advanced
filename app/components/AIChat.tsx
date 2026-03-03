@@ -21,11 +21,10 @@ interface Project {
 }
 
 
-export function AIChat({ onRefresh, userId }: { onRefresh?: () => void, userId: string }) {
+export function AIChat({ onRefresh, userId, projects }: { onRefresh?: () => void, userId: string, projects: Project[] }) {
     const { t, language } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [localInput, setLocalInput] = useState('');
-    const [projects, setProjects] = useState<Project[]>([]);
     const [showAutocomplete, setShowAutocomplete] = useState(false);
     const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -76,22 +75,7 @@ export function AIChat({ onRefresh, userId }: { onRefresh?: () => void, userId: 
         messages.some((m: any) => (m.toolInvocations || []).some((ti: any) => ti.state === 'call'))
     );
 
-    // Fetch employee projects on mount
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const response = await fetch(`/api/employee/projects?userId=${userId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    // API may return a flat array or { projects: [...] }
-                    setProjects(Array.isArray(data) ? data : (data.projects || []));
-                }
-            } catch (error) {
-                console.error('Error fetching projects:', error);
-            }
-        };
-        fetchProjects();
-    }, []);
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
