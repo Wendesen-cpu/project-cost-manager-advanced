@@ -7,10 +7,8 @@ export default function EmployeeLoginPage() {
     const router = useRouter()
 
     const handleSuccess = (userData: any) => {
-        // Store role for middleware/layout and userId to identify the logged-in user
         document.cookie = `mock-role=${userData.role}; path=/`
         document.cookie = `user-id=${userData.id}; path=/`
-        console.log("userData", userData)
         router.push('/portal')
     }
 

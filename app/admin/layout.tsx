@@ -7,10 +7,11 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-    const handleLogout = () => {
-        document.cookie = 'mock-role=; Max-Age=0; path=/'
-        document.cookie = 'user-id=; Max-Age=0; path=/'
-        window.location.href = '/'
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        document.cookie = 'mock-role=; Max-Age=0; path=/';
+        document.cookie = 'user-id=; Max-Age=0; path=/';
+        window.location.href = '/';
     }
 
     return (
