@@ -27,7 +27,11 @@ const ollama = createOllama({
 
 export async function POST(req: Request) {
 
-    const { messages } = await req.json();
+    const { messages, language: bodyLanguage } = await req.json();
+    const language = bodyLanguage || (req as Request).headers.get('X-Language') || 'en';
+    const languageInstruction = language === 'it'
+        ? 'IMPORTANT: The app is set to Italian. You MUST respond exclusively in Italian (Italiano) in every message. Never switch to English.'
+        : 'The app is set to English. Respond in English by default. However, if the user writes to you in Italian, respond in Italian to match their language.';
     const session = await getSession();
 
     if (!session || typeof session.userId !== 'string') {
@@ -89,6 +93,9 @@ export async function POST(req: Request) {
     const today = new Date().toISOString().split('T')[0];
 
     const systemPrompt = `You are the Project Pro Assistant — an AI that helps employees log work hours, manage vacation, view logs, and update time entries.
+
+## LANGUAGE
+${languageInstruction}
 
 ## ABSOLUTE RULE — PROJECT SELECTION (NO EXCEPTIONS)
 

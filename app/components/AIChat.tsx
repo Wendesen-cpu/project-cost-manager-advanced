@@ -22,7 +22,7 @@ interface Project {
 
 
 export function AIChat({ onRefresh, userId }: { onRefresh?: () => void, userId: string }) {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [localInput, setLocalInput] = useState('');
     const [projects, setProjects] = useState<Project[]>([]);
@@ -35,6 +35,11 @@ export function AIChat({ onRefresh, userId }: { onRefresh?: () => void, userId: 
     // Fallback picker state — used when AI writes text asking for project instead of calling tool
     const [fallbackSelectedProject, setFallbackSelectedProject] = useState('');
 
+    // Always hold the latest language in a ref so experimental_prepareRequestBody
+    // (called at send-time, not at hook-init) can safely read it without stale closures.
+    const languageRef = useRef(language);
+    useEffect(() => { languageRef.current = language; }, [language]);
+
     const {
         messages,
         status,
@@ -43,6 +48,13 @@ export function AIChat({ onRefresh, userId }: { onRefresh?: () => void, userId: 
     } = useChat({
         id: 'ollama-chat-v13',
         api: '/api/chat',
+        // Called fresh on every message send — reads the ref to avoid stale closures
+        experimental_prepareRequestBody: ({ messages, id, requestBody }: any) => ({
+            ...requestBody,
+            messages,
+            id,
+            language: languageRef.current,
+        }),
     } as any) as any;
 
     const isLoading = status === 'submitted' || status === 'streaming';
