@@ -43,7 +43,6 @@ export async function POST(req: Request) {
     if (!employeeId) {
         return new Response(JSON.stringify({ error: 'userId is required' }), { status: 400 });
     }
-
     const modelMessages = messages.map((m: any) => {
         let textContent = '';
         if (typeof m.content === 'string') {
@@ -139,7 +138,7 @@ Assistant: [calls requestProjectSelection tool with actionType="logWork", hours=
 
 
     const result = streamText({
-        model: groq('openai/gpt-oss-120b'),
+        model: groq(process.env.SELECTED_AI_MODEL || 'openai/gpt-oss-120b'),
         system: systemPrompt,
         messages: modelMessages,
 
