@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -77,18 +77,26 @@ jobs:
           timeout: 60s
           command_timeout: 15m
           script: |
-            # 1. Ensure Node.js 22 is installed before proceeding
+            # 1. Force Upgrade to Node.js 22 (Handling AL2023 conflicts)
             NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
             if [ "$NODE_VERSION" -lt "22" ]; then
-              echo "Node version is $NODE_VERSION. Upgrading to Node 22..."
+              echo "Current Node version is $NODE_VERSION. Upgrading to Node 22..."
               curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
-              sudo yum install -y nodejs
+              
+              # Remove the specific packages that were causing the dependency 'Problem'
+              sudo dnf remove -y nodejs-full-i18n nodejs-npm nodejs || true
+              
+              # Install Node 22 and allow erasing of any remaining conflicting libraries
+              sudo dnf install -y nodejs --allowerasing
+              
+              echo "Upgrade complete. New version: $(node -v)"
             fi
 
             set -e
             cd /home/ec2-user/app
             
             # 2. Cleanup and Extraction
+            # We use '|| true' so the script doesn't stop if the process doesn't exist yet
             pm2 delete nextjs-app || true
             sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' || true
             tar -xzf deploy.tar.gz
@@ -98,10 +106,13 @@ jobs:
             OLD_HASH=$(cat .pkg_hash 2>/dev/null || echo "")
             NEW_HASH=$(sha256sum package.json | awk '{print $1}')
             if [ "$NEW_HASH" != "$OLD_HASH" ]; then
+              echo "package.json changed. Running npm ci..."
               export NODE_OPTIONS="--max_old_space_size=384"
-              # Now running on Node 22, so EBADENGINE won't trigger
+              # Running on Node 22 now, so the ai-sdk-ollama engine check will pass
               npm ci --omit=dev --prefer-offline --no-audit --no-fund
               echo "$NEW_HASH" > .pkg_hash
+            else
+              echo "package.json unchanged. Skipping npm ci."
             fi
 
             # 4. Environment and Execution
@@ -110,6 +121,9 @@ jobs:
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
             
+            # Run database seeds
             node --env-file=.env prisma/seed.mjs
+            
+            # Start the application
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
             pm2 save
