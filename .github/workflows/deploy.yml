@@ -75,28 +75,28 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           timeout: 60s
-          command_timeout: 15m
+          command_timeout: 30m
           script: |
-            # 1. Force Upgrade to Node.js 22 (Handling AL2023 conflicts)
-            NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
+            # 1. Force Upgrade to Node.js 22 & Fix Environment
+            NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1 || echo "0")
             if [ "$NODE_VERSION" -lt "22" ]; then
               echo "Current Node version is $NODE_VERSION. Upgrading to Node 22..."
               curl -fsSL https://rpm.nodesource.com/setup_22.x | sudo bash -
-              
-              # Remove the specific packages that were causing the dependency 'Problem'
               sudo dnf remove -y nodejs-full-i18n nodejs-npm nodejs || true
-              
-              # Install Node 22 and allow erasing of any remaining conflicting libraries
               sudo dnf install -y nodejs --allowerasing
-              
-              echo "Upgrade complete. New version: $(node -v)"
             fi
+
+            # Re-link PM2 to the new Node 22 environment
+            sudo npm install -g pm2
+            export PATH=$PATH:/usr/local/bin
+
+            echo "Verified Node Version: $(node -v)"
+            echo "Verified PM2 Version: $(pm2 -v)"
 
             set -e
             cd /home/ec2-user/app
             
             # 2. Cleanup and Extraction
-            # We use '|| true' so the script doesn't stop if the process doesn't exist yet
             pm2 delete nextjs-app || true
             sync && sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' || true
             tar -xzf deploy.tar.gz
@@ -108,7 +108,6 @@ jobs:
             if [ "$NEW_HASH" != "$OLD_HASH" ]; then
               echo "package.json changed. Running npm ci..."
               export NODE_OPTIONS="--max_old_space_size=384"
-              # Running on Node 22 now, so the ai-sdk-ollama engine check will pass
               npm ci --omit=dev --prefer-offline --no-audit --no-fund
               echo "$NEW_HASH" > .pkg_hash
             else
