@@ -119,9 +119,14 @@ jobs:
             echo "NEXT_PUBLIC_API_URL=https://neosinternalprojects.dpdns.org" >> .env
             echo "SYSTEM_ADMIN=${{ secrets.SYSTEM_ADMIN }}" >> .env
             echo "SYSTEM_ADMIN_PASSPWORD=${{ secrets.SYSTEM_ADMIN_PASSPWORD }}" >> .env
+            echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
+            echo "SELECTED_AI_MODEL=${{ secrets.SELECTED_AI_MODEL }}" >> .env
+
+
             
             # Run database seeds
             node --env-file=.env prisma/seed.mjs
+            
             
             # Start the application
             pm2 start npm --name "nextjs-app" -- start -- -H 0.0.0.0
