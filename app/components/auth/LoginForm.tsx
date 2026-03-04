@@ -5,18 +5,18 @@ import { Mail, Lock, LogIn, ArrowRight, ArrowLeft, Shield, User } from 'lucide-r
 import Link from 'next/link'
 
 interface LoginFormProps {
-    type: 'admin' | 'employee'
+    type: 'ADMIN' | 'EMPLOYEE'
     // Callback on successful login
     onSuccess: (userData: any) => void
 }
 
-export default function LoginForm({ type, onSuccess }: LoginFormProps) {
+export default function LoginForm({ onSuccess, type }: LoginFormProps) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
-    const isAdmin = type === 'admin'
+    const isAdmin = type === 'ADMIN'
     const accentColor = isAdmin ? '#0F172B' : '#2563EB'
     const icon = isAdmin ? <Shield className="text-white size-6" /> : <User className="text-white size-6" />
     const title = isAdmin ? 'ADMIN MANAGEMENT PANEL' : 'EMPLOYEE PERSONAL PORTAL'
@@ -32,10 +32,10 @@ export default function LoginForm({ type, onSuccess }: LoginFormProps) {
         setError('')
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password, type })
             })
 
             const data = await res.json()

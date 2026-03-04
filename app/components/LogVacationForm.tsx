@@ -3,41 +3,50 @@
 import React, { useState } from 'react'
 import { usePortalData } from '../portal/PortalDataProvider'
 import { useLanguage } from '../i18n'
+import { logVacation } from '../actions/timelogs'
 
 export default function LogVacationForm() {
-    const { user, refreshData } = usePortalData()
+    const { user, addLog, updateUser } = usePortalData()
     const { t } = useLanguage()
     const today = new Date().toISOString().split('T')[0]
 
     const [date, setDate] = useState(today)
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!user) return
 
+        setError('')
         setLoading(true)
         try {
-            const res = await fetch('/api/employee/time-logs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: user.id,
-                    date,
-                    hours: 8, // Using 8 hours to represent 1 vacation day
-                    type: 'VACATION'
-                })
+            const result = await logVacation({
+                userId: user.id,
+                date,
+                hours: 8,
             })
 
-            if (!res.ok) {
-                const errData = await res.json()
-                throw new Error(errData.error || 'Failed to log vacation')
+            if (result.conflict) {
+                setError(result.message || 'A vacation is already logged for this date.')
+                return
             }
 
-            await refreshData()
+            if ('error' in result && result.error) {
+                throw new Error(result.error as string)
+            }
+
+            if (result.log) {
+                addLog(result.log)
+                // Optimistically update vacation days balance
+                updateUser({
+                    ...user,
+                    remainingVacationDays: (user.remainingVacationDays || 0) - 1,
+                })
+            }
         } catch (err: any) {
             console.error(err)
-            alert(err.message || 'Error logging vacation. Please try again.')
+            setError(err.message || 'Error logging vacation. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -64,6 +73,13 @@ export default function LogVacationForm() {
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 />
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <p className="text-[12px] text-red-500 leading-5" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    {error}
+                </p>
+            )}
 
             {/* Submit Button */}
             <button

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { X, Clock, ArrowLeft, Palmtree } from "lucide-react";
 import clsx from "clsx";
 import { usePortalData } from "../portal/PortalDataProvider";
+import { logWork, logVacation } from "../actions/timelogs";
 
 interface AddLogModalProps {
   isOpen: boolean;
@@ -41,67 +42,45 @@ export default function AddLogModal({
 
     setLoading(true);
     try {
-      // Use local date without timezone conversion
       const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
-      console.log("📝 Submitting log:", {
-        dateStr,
-        type: logType,
-        hours,
-        projectId,
-      });
+      let result: { success?: boolean; log?: any; error?: string };
 
-      const res = await fetch("/api/employee/time-logs", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      if (logType === "WORK") {
+        result = await logWork({
           userId: user.id,
-          projectId: logType === "WORK" ? projectId : null,
+          projectId,
           date: dateStr,
           hours: parseFloat(hours),
-          type: logType,
-        }),
-      });
-
-      const responseData = await res.json();
-      console.log("📡 API Response:", {
-        status: res.status,
-        data: responseData,
-      });
-
-      if (!res.ok) {
-        throw new Error(responseData.error || "Failed to log");
+        });
+      } else {
+        result = await logVacation({
+          userId: user.id,
+          date: dateStr,
+          hours: parseFloat(hours),
+        });
       }
 
-      // Optimistic update: add the log immediately to local state
-      const newLog = responseData[0];
-      console.log("⚡ Optimistic update: Adding log to state", newLog);
-      addLog(newLog);
+      if (result.error) {
+        throw new Error(result.error);
+      }
 
-      // If it's a vacation, update user's remaining vacation days
+      // Optimistic local state update
+      if (result.log) addLog(result.log);
+
       if (logType === "VACATION") {
         const daysDeducted = parseFloat(hours || "8") / 8;
-        const updatedUser = {
+        updateUser({
           ...user,
-          remainingVacationDays:
-            (user.remainingVacationDays || 0) - daysDeducted,
-        };
-        console.log(
-          "✅ Updating vacation days:",
-          updatedUser.remainingVacationDays,
-        );
-        updateUser(updatedUser);
+          remainingVacationDays: (user.remainingVacationDays || 0) - daysDeducted,
+        });
       }
 
-      console.log("✅ Modal closing");
       onClose();
       resetForm();
     } catch (err) {
-      console.error("❌ Error:", err);
       const message =
-        err instanceof Error
-          ? err.message
-          : "Error adding log. Please try again.";
+        err instanceof Error ? err.message : "Error adding log. Please try again.";
       setError(message);
     } finally {
       setLoading(false);

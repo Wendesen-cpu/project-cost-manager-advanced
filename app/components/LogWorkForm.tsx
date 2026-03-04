@@ -3,9 +3,10 @@
 import React, { useState } from 'react'
 import { usePortalData } from '../portal/PortalDataProvider'
 import { useLanguage } from '../i18n'
+import { logWork } from '../actions/timelogs'
 
 export default function LogWorkForm() {
-    const { user, projects, refreshData } = usePortalData()
+    const { user, projects, addLog, refreshData } = usePortalData()
     const { t } = useLanguage()
     const today = new Date().toISOString().split('T')[0]
 
@@ -13,33 +14,36 @@ export default function LogWorkForm() {
     const [projectId, setProjectId] = useState('')
     const [hours, setHours] = useState('')
     const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!user || !projectId || !hours) return
 
+        setError('')
         setLoading(true)
         try {
-            const res = await fetch('/api/employee/time-logs', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: user.id,
-                    projectId,
-                    date,
-                    hours: parseFloat(hours),
-                    type: 'WORK'
-                })
+            const result = await logWork({
+                userId: user.id,
+                projectId,
+                date,
+                hours: parseFloat(hours),
             })
 
-            if (!res.ok) throw new Error('Failed to log work')
+            if (result.conflict) {
+                setError(result.message || 'Conflict detected. Please resolve before continuing.')
+                return
+            }
 
-            // Wait for refresh to show the new log directly on the calendar
-            await refreshData()
-            setHours('') // reset form
-        } catch (err) {
+            if ('error' in result && result.error) {
+                throw new Error(result.error as string)
+            }
+
+            if (result.log) addLog(result.log)
+            setHours('')
+        } catch (err: any) {
             console.error(err)
-            alert('Error logging work. Please try again.')
+            setError(err.message || 'Error logging work. Please try again.')
         } finally {
             setLoading(false)
         }
@@ -73,7 +77,6 @@ export default function LogWorkForm() {
                 >
                     {t('common.project')}
                 </label>
-                {/* We use a select here to match the wireframe intent, styled similar to Figma */}
                 <select
                     value={projectId}
                     onChange={(e) => setProjectId(e.target.value)}
@@ -108,6 +111,13 @@ export default function LogWorkForm() {
                     style={{ fontFamily: 'Arial, sans-serif' }}
                 />
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <p className="text-[12px] text-red-500 leading-5" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    {error}
+                </p>
+            )}
 
             {/* Submit Button */}
             <button

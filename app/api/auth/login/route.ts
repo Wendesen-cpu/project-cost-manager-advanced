@@ -1,20 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@lib/prisma'
+import { createSession } from '@/app/lib/auth'
 
 export async function POST(req: NextRequest) {
     try {
-        const { email, password } = await req.json()
+        const { email, password, type } = await req.json()
 
         const user = await prisma.user.findUnique({
             where: { email }
         })
 
-        if (!user || user.password !== password) {
+        // For type='ADMIN', accept both ADMIN and SYSTEM_ADMIN roles
+        const roleAllowed = type === 'ADMIN'
+            ? (user?.role === 'ADMIN' || user?.role === 'SYSTEM_ADMIN')
+            : user?.role === type;
+
+        if (!user || user.password !== password || !roleAllowed) {
             return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
         }
 
-        // Return user data (role) for client-side routing
-        // In a real app, this would set a session/JWT
+        await createSession({
+            userId: user.id,
+            role: user.role,
+            name: user.name,
+            lastName: user.lastName
+        });
+
         return NextResponse.json({
             id: user.id,
             email: user.email,

@@ -5,12 +5,16 @@ import TopNav from '../components/TopNav'
 import EmployeeSidebar from '../components/EmployeeSidebar'
 import PortalMainContent from '../components/PortalMainContent'
 import { PortalDataProvider, usePortalData } from './PortalDataProvider'
+import { AIChat } from '../components/AIChat'
 
 export default function EmployeePortal() {
-    const handleLogout = () => {
-        document.cookie = 'mock-role=; Max-Age=0; path=/'
-        document.cookie = 'user-id=; Max-Age=0; path=/'
-        window.location.href = '/'
+    const handleLogout = async () => {
+        // Clear the httpOnly JWT session server-side first
+        await fetch('/api/auth/logout', { method: 'POST' });
+        // Then clear the plain-cookie auth layer used by middleware
+        document.cookie = 'mock-role=; Max-Age=0; path=/';
+        document.cookie = 'user-id=; Max-Age=0; path=/';
+        window.location.href = '/';
     }
 
     return (
@@ -21,7 +25,7 @@ export default function EmployeePortal() {
 }
 
 function PortalContent({ onLogout }: { onLogout: () => void }) {
-    const { user, loading } = usePortalData()
+    const { user, projects, loading, silentRefresh } = usePortalData()
     if (loading) {
         return (
             <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -43,6 +47,7 @@ function PortalContent({ onLogout }: { onLogout: () => void }) {
                     </div>
                 </div>
             </main>
+            <AIChat userId={user?.id || ''} onRefresh={silentRefresh} projects={projects} />
         </div>
     )
 }
